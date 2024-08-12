@@ -15,7 +15,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local');
 
 const User = require('./auth/models/userModel');
-const Service = require('./services/serviceModel');
+const Service = require('./consult/models/serviceModel');
 
 const homeRoutes = require('./routes/homeRoute');
 const userRoutes = require('./routes/userRoutes');

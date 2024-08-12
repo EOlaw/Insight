@@ -1,7 +1,7 @@
 const User = require('../../auth/models/userModel');
 const Consultant = require('../models/consultantModel');
 const Consultation = require('../models/consultationModel');
-const Service = require('../../services/serviceModel');
+const Service = require('../models/serviceModel');
 
 const consultantControllers = {
     // Get Consultant Profile

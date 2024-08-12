@@ -1,7 +1,7 @@
 const Consultation = require('../models/consultationModel');
 const Client = require('../models/clientModel');
 const Consultant = require('../models/consultantModel');
-const Service = require('../../services/serviceModel');
+const Service = require('../models/serviceModel');
 
 const consultationController = {
     renderConsultation: async (req, res) => {

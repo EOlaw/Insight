@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const serviceControllers = require('../services/serviceController');
+const serviceControllers = require('../consult/controllers/serviceController');
 // const { isAuthenticated, isAdmin, isClient, isConsultant } = require('../middleware/authMiddlewares');
 
 // Service Routes
