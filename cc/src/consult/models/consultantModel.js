@@ -9,7 +9,7 @@ const consultantSchema = new Schema({
   ratings: [{ type: Number }], // Array of ratings received
   certifications: [{ type: String }], // Array of relevant certifications
   consultationHistory: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Consultation' }], // References to past consultations
-});
+}, { timestamps: true });
 
 const Consultant = mongoose.model('Consultant', consultantSchema);
 module.exports = Consultant

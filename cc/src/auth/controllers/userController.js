@@ -1,44 +1,64 @@
 const User = require('../models/userModel');
 const Consultant = require('../../consult/models/consultantModel');
 const Client = require('../../consult/models/clientModel');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const passport = require('passport');
 
 const userController = {
     // Register Page
     renderRegister: (req, res) => {
-        try {
-            const user = req.user;
-            if (user) return res.redirect('/dashboard');
-            return res.status(200).render('users/register');
-        } catch (err) {
-            res.status(500).json({ message: 'Internal server error', error: err.message });
+        if (req.isAuthenticated()) {
+            return res.redirect('/dashboard');
         }
+        res.status(200).render('users/register');
     },
 
     // Register User
     registerUser: async (req, res) => {
         try {
             const { username, email, password, role } = req.body;
-            const existingUser = await User.findOne({ $or: [{ username }, { email }] });
             
+            // Validate role
+            const validRoles = ['consultant', 'client', 'staff'];
+            if (!validRoles.includes(role)) {
+                return res.status(400).json({ message: 'Invalid role. Must be consultant, client, or staff.' });
+            }
+
+            // Check if user already exists
+            const existingUser = await User.findOne({ $or: [{ username }, { email }] });
             if (existingUser) {
                 return res.status(400).json({ message: 'Username or email already exists' });
             }
 
-            const hashedPassword = await bcrypt.hash(password, 10);
-            const newUser = new User({ username, email, password: hashedPassword, role });
-            await newUser.save();
+            // Create new user
+            const newUser = new User({ username, email, role });
+            
+            // Register user with passport
+            User.register(newUser, password, async (err, user) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Error registering user', error: err.message });
+                }
 
-            if (role === 'consultant') {
-                const consultant = new Consultant({ user: newUser._id });
-                await consultant.save();
-            } else if (role === 'client') {
-                const client = new Client({ user: newUser._id });
-                await client.save();
-            }
+                // Create associated profile based on role
+                try {
+                    switch (role) {
+                        case 'consultant':
+                            await new Consultant({ user: user._id }).save();
+                            break;
+                        case 'client':
+                            await new Client({ user: user._id }).save();
+                            break;
+                        case 'staff':
+                            await new Staff({ user: user._id }).save();
+                            break;
+                    }
+                } catch (err) {
+                    // If profile creation fails, delete the user and return an error
+                    await User.findByIdAndDelete(user._id);
+                    return res.status(500).json({ message: 'Error creating user profile', error: err.message });
+                }
 
-            res.status(201).json({ message: 'User registered successfully' });
+                res.status(201).json({ message: 'User registered successfully', role: user.role });
+            });
         } catch (err) {
             res.status(500).json({ message: 'Error registering user', error: err.message });
         }
@@ -46,49 +66,44 @@ const userController = {
 
     // Login Page
     renderLogin: (req, res) => {
-        try {
-            const user = req.user;
-            if (user) return res.redirect('/dashboard');
-            return res.status(200).render('users/login');
-        } catch (err) {
-            res.status(500).json({ message: 'Internal server error', error: err.message });
+        if (req.isAuthenticated()) {
+            return res.redirect('/dashboard');
         }
+        res.status(200).render('users/login');
     },
 
     // Login User
-    loginUser: async (req, res) => {
-        try {
-            const { username, password } = req.body;
-            const user = await User.findOne({ username });
-
+    loginUser: (req, res, next) => {
+        passport.authenticate('local', (err, user, info) => {
+            if (err) {
+                return res.status(500).json({ message: 'Error during authentication', error: err.message });
+            }
             if (!user) {
-                return res.status(401).json({ message: 'Invalid credentials' });
+                return res.status(401).json({ message: info.message || 'Authentication failed' });
             }
-
-            const isMatch = await bcrypt.compare(password, user.password);
-            if (!isMatch) {
-                return res.status(401).json({ message: 'Invalid credentials' });
-            }
-
-            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-            res.cookie('token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
-
-            res.status(200).json({ message: 'Login successful', user: { id: user._id, username: user.username, role: user.role } });
-        } catch (err) {
-            res.status(500).json({ message: 'Error logging in', error: err.message });
-        }
+            req.logIn(user, (err) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Error logging in', error: err.message });
+                }
+                return res.status(200).json({ message: 'Login successful', user: { id: user._id, username: user.username, role: user.role } });
+            });
+        })(req, res, next);
     },
 
     // Logout User
     logoutUser: (req, res) => {
-        res.clearCookie('token');
-        res.status(200).json({ message: 'Logged out successfully' });
+        req.logout((err) => {
+            if (err) {
+                return res.status(500).json({ message: 'Error logging out', error: err.message });
+            }
+            res.status(200).json({ message: 'Logged out successfully' });
+        });
     },
 
     // Get User Profile
     getUserProfile: async (req, res) => {
         try {
-            const user = await User.findById(req.user.id).select('-password');
+            const user = await User.findById(req.user._id).select('-password');
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
             }
@@ -103,7 +118,7 @@ const userController = {
         try {
             const { firstName, lastName, phoneNumber } = req.body;
             const updatedUser = await User.findByIdAndUpdate(
-                req.user.id,
+                req.user._id,
                 { $set: { firstName, lastName, phoneNumber } },
                 { new: true, runValidators: true }
             ).select('-password');

@@ -11,7 +11,7 @@ const consultationSchema = new Schema({
   notes: { type: String }, // Notes about the consultation
   followUpActions: [{ type: String }], // Array of follow-up actions
   recordingUrl: { type: String }, // URL to consultation recording if applicable
-});
+}, { timestamps: true });
 
 const Consultation = mongoose.model('Consultation', consultationSchema);
 module.exports = Consultation

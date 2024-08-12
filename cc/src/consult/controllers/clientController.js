@@ -1,11 +1,12 @@
 const Client = require('../../consult/models/clientModel');
 const Consultation = require('../../consult/models/consultationModel');
+const User = require('../../auth/models/userModel');
 
 const clientController = {
     // Get Client Profile
     getClientProfile: async (req, res) => {
         try {
-            const client = await Client.findOne({ user: req.user.id }).populate('user', '-password');
+            const client = await Client.findOne({ user: req.user._id }).populate('user', '-password');
             if (!client) {
                 return res.status(404).json({ message: 'Client profile not found' });
             }
@@ -19,8 +20,17 @@ const clientController = {
     updateClientProfile: async (req, res) => {
         try {
             const { company, industry, billingAddress, preferredServices } = req.body;
+            
+            // Validate input
+            if (billingAddress && typeof billingAddress !== 'string') {
+                return res.status(400).json({ message: 'Billing address must be a string' });
+            }
+            if (preferredServices && (!Array.isArray(preferredServices) || preferredServices.length === 0)) {
+                return res.status(400).json({ message: 'Preferred services must be a non-empty array' });
+            }
+
             const updatedClient = await Client.findOneAndUpdate(
-                { user: req.user.id },
+                { user: req.user._id },
                 { $set: { company, industry, billingAddress, preferredServices } },
                 { new: true, runValidators: true }
             ).populate('user', '-password');
@@ -38,9 +48,11 @@ const clientController = {
     // Get Client's Consultations
     getClientConsultations: async (req, res) => {
         try {
-            const consultations = await Consultation.find({ client: req.user.id })
+            const consultations = await Consultation.find({ client: req.user._id })
                 .populate('consultant', 'username')
-                .populate('service', 'name');
+                .populate('service', 'name')
+                .sort({ dateTime: -1 });  // Sort by date, most recent first
+
             res.status(200).json(consultations);
         } catch (err) {
             res.status(500).json({ message: 'Error fetching consultations', error: err.message });
@@ -51,11 +63,28 @@ const clientController = {
     bookConsultation: async (req, res) => {
         try {
             const { consultantId, serviceId, dateTime, duration } = req.body;
+            
+            // Validate input
+            if (!consultantId || !serviceId || !dateTime || !duration) {
+                return res.status(400).json({ message: 'Missing required fields' });
+            }
+            if (typeof duration !== 'number' || duration <= 0) {
+                return res.status(400).json({ message: 'Duration must be a positive number' });
+            }
+
+            // Check if consultant exists and is available
+            const consultant = await User.findById(consultantId);
+            if (!consultant || consultant.role !== 'consultant') {
+                return res.status(404).json({ message: 'Consultant not found' });
+            }
+
+            // TODO: Check consultant's availability
+
             const newConsultation = new Consultation({
-                client: req.user.id,
+                client: req.user._id,
                 consultant: consultantId,
                 service: serviceId,
-                dateTime,
+                dateTime: new Date(dateTime),
                 duration
             });
             await newConsultation.save();
@@ -70,8 +99,9 @@ const clientController = {
     cancelConsultation: async (req, res) => {
         try {
             const { consultationId } = req.params;
+            
             const consultation = await Consultation.findOneAndUpdate(
-                { _id: consultationId, client: req.user.id, status: 'scheduled' },
+                { _id: consultationId, client: req.user._id, status: 'scheduled' },
                 { $set: { status: 'cancelled' } },
                 { new: true }
             );

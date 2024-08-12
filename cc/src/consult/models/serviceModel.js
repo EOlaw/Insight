@@ -9,7 +9,7 @@ const serviceSchema = new Schema({
   basePrice: { type: Number, required: true }, // Base price for the service
   isActive: { type: Boolean, default: true }, // Whether the service is currently offered
   requiredSpecializations: [{ type: String }], // Specializations required for this service
-});
+}, { timestamps: true });
 
 const Service = mongoose.model('Service', serviceSchema);
 module.exports = Service;

@@ -7,7 +7,7 @@ const userSchema = new Schema({
   email: { type: String, required: true, unique: true }, // User's email address for communication
   firstName: { type: String, required: true }, // User's first name
   lastName: { type: String, required: true }, // User's last name
-  phoneNumber: { type: String }, // Optional phone number for contact
+  phoneNumber: { type: Number, unique: true }, // Optional phone number for contact
   role: { type: String, enum: ['client', 'consultant', 'staff'], required: true }, // User's role in the system
   isAdmin: { type: Boolean, default: false }, // Boolean flag for admin status
   isDeveloper: { type: Boolean, default: false }, // Boolean flag for developer status
@@ -15,7 +15,7 @@ const userSchema = new Schema({
   lastLogin: { type: Date }, // Timestamp for last login
   twoFactorSecret: { type: String }, // Secret for two-factor authentication
   isVerified: { type: Boolean, default: false }, // Email verification status
-});
+}, { timestamps: true });
 
 userSchema.plugin(passportLocalMongoose); // Adds Passport-Local Mongoose functionality
 

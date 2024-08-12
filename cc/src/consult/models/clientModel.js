@@ -9,6 +9,7 @@ const clientSchema = new Schema({
   preferredServices: [{ type: String }], // Array of preferred service types
   consultationHistory: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Consultation' }], // References to past consultations
   feedback: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Feedback' }], // References to feedback provided
-});
+}, { timestamps: true });
 
-module.exports = mongoose.model('Client', clientSchema);
+const Client = mongoose.model('Client', clientSchema);
+module.exports = Client
