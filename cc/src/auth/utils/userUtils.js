@@ -24,7 +24,7 @@ function isAuthenticated(req, res, next) {
 }
 
 // Middleware to check if user is admin
-function isAdmin(req, res, next) {
+function authorizeAdmin(req, res, next) {
     // Check if user is authenticated
     if (req.isAuthenticated()) {
         // Retrieve the user from the database
@@ -52,7 +52,7 @@ function isAdmin(req, res, next) {
 }
 
 // Middleware to check if user is authorized as consultant
-function isConsultant(req, res, next) {
+function authorizeConsultant(req, res, next) {
     // Check if user is authenticated
     if (req.isAuthenticated()) {
         // Retrieve the user from the database
@@ -80,7 +80,7 @@ function isConsultant(req, res, next) {
 }
 
 // Middleware to check if user is authorized as client
-function isClient(req, res, next) {
+function authorizeClient(req, res, next) {
     // Check if user is authenticated
     if (req.isAuthenticated()) {
         // Retrieve the user from the database
@@ -106,4 +106,31 @@ function isClient(req, res, next) {
     }
 }
 
-module.exports = { isAuthenticated, isAdmin, isConsultant, isClient }
+// Middleware to check if user is authorized as client
+function authorizeDeveloper(req, res, next) {
+    // Check if user is authenticated
+    if (req.isAuthenticated()) {
+        // Retrieve the user from the database
+        User.findById(req.user._id)
+            .then((user) => {
+                if (user && user.role === 'developer') {
+                    // If the user is a client, allow access to the route
+                    next();
+                } else {
+                    // If the user is not a client, deny access with status 403
+                    res.status(403).send('Access denied. You are not allowed to access.');
+                }
+            })
+            .catch((err) => {
+                console.error('Error while checking authorization as client:', err);
+                res.status(500).send('Internal Server Error');
+            });
+    } else {
+        // If the user is not authenticated, redirect to the login page
+        console.log('User is not authenticated. Redirecting to /user/login');
+        return res.status(401).render('error',{ error: 'You must be logged in to access this resource' })
+        // res.status(401).redirect('/insightserenity/user/login');
+    }
+}
+
+module.exports = { isAuthenticated, authorizeAdmin, authorizeConsultant, authorizeClient, authorizeDeveloper }

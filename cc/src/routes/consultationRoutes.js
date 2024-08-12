@@ -1,18 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const consultationControllers = require('../consult/controllers/consultationController');
-const { isAuthenticated, isClient } = require('../auth/utils/userUtils');
+const consultationController = require('../consult/controllers/consultationController');
+const { isAuthenticated } = require('../auth/utils/userUtils');
 
-// Consultation Routes
-router.route('/create')
-    .get(isAuthenticated, isClient, consultationControllers.renderConsultation)
-    .post(isAuthenticated, isClient, consultationControllers.createConsultation)
-router.route('/')
-    .get(isAuthenticated, isClient, consultationControllers.getAllConsultations)
-
-router.route('/:id')
-    .get(isAuthenticated, consultationControllers.getConsultationById)
-    .put(isAuthenticated, consultationControllers.updateConsultation)
-    .delete(isAuthenticated, consultationControllers.deleteConsultation)
+router.get('/:consultationId', isAuthenticated, consultationController.getConsultationDetails);
+router.put('/:consultationId/notes', isAuthenticated, consultationController.updateConsultationNotes);
+router.put('/:consultationId/complete', isAuthenticated, consultationController.completeConsultation);
+// router.post('/:consultationId/feedback', isAuthenticated, consultationController.provideFeedback);
 
 module.exports = router;

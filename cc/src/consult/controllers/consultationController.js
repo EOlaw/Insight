@@ -1,136 +1,98 @@
-const Consultation = require('../models/consultationModel');
-const Client = require('../models/clientModel');
-const Consultant = require('../models/consultantModel');
-const Service = require('../models/serviceModel');
+const Consultation = require('../../consult/models/consultationModel');
+// const Feedback = require('../../consult/models/feedbackModel');
 
 const consultationController = {
-    renderConsultation: async (req, res) => {
+    // Get Consultation Details
+    getConsultationDetails: async (req, res) => {
         try {
-            const services = await Service.find(); // Fetch all services from your database
-            const consultantSpecializations = await Consultant.distinct('specializations'); // Adjust this as per your Consultant model
-            res.render('consultations/create', { 
-                services,
-                specializations: consultantSpecializations
-             }); // Pass services to the EJS template
+            const { consultationId } = req.params;
+            const consultation = await Consultation.findById(consultationId)
+                .populate('client', 'username')
+                .populate('consultant', 'username')
+                .populate('service', 'name');
+
+            if (!consultation) {
+                return res.status(404).json({ message: 'Consultation not found' });
+            }
+
+            res.status(200).json(consultation);
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: 'Error fetching consultation details', error: err.message });
         }
     },
-    // Create a new consultation (handled by clientControllers)
-    createConsultation: async (req, res) => {
+
+    // Update Consultation Notes
+    updateConsultationNotes: async (req, res) => {
         try {
-            const { serviceId, date, duration, mode, notes, specializations } = req.body;
-    
-            // Ensure the client is logged in and retrieve their ID
-            const userId = req.user._id;
-            console.log('Logged in User ID:', userId);
-    
-            // Retrieve client profile using userId
-            const client = await Client.findOne({ userId });
-            if (!client) {
-                return res.status(404).json({ error: 'Client profile not found' });
+            const { consultationId } = req.params;
+            const { notes } = req.body;
+            const updatedConsultation = await Consultation.findByIdAndUpdate(
+                consultationId,
+                { $set: { notes } },
+                { new: true, runValidators: true }
+            );
+
+            if (!updatedConsultation) {
+                return res.status(404).json({ message: 'Consultation not found' });
             }
-            const clientId = client._id;
-            console.log('Client ID:', clientId);
-    
-            if (!specializations || specializations.length === 0) {
-                return res.status(400).json({ error: 'Specializations must be provided' });
+
+            res.status(200).json({ message: 'Consultation notes updated successfully', consultation: updatedConsultation });
+        } catch (err) {
+            res.status(500).json({ message: 'Error updating consultation notes', error: err.message });
+        }
+    },
+
+    // Complete Consultation
+    completeConsultation: async (req, res) => {
+        try {
+            const { consultationId } = req.params;
+            const updatedConsultation = await Consultation.findByIdAndUpdate(
+                consultationId,
+                { $set: { status: 'completed' } },
+                { new: true, runValidators: true }
+            );
+
+            if (!updatedConsultation) {
+                return res.status(404).json({ message: 'Consultation not found' });
             }
-    
-            // Check if the service exists
-            const service = await Service.findById(serviceId);
-            if (!service) {
-                return res.status(404).json({ error: 'Service not found' });
+
+            res.status(200).json({ message: 'Consultation marked as completed', consultation: updatedConsultation });
+        } catch (err) {
+            res.status(500).json({ message: 'Error completing consultation', error: err.message });
+        }
+    },
+
+    /*
+
+    // Provide Feedback
+    provideFeedback: async (req, res) => {
+        try {
+            const { consultationId } = req.params;
+            const { rating, comment } = req.body;
+            
+            const consultation = await Consultation.findById(consultationId);
+            if (!consultation) {
+                return res.status(404).json({ message: 'Consultation not found' });
             }
-    
-            // Find an available consultant with the required specializations
-            const consultant = await Consultant.findOne({
-                specializations: { $all: specializations },
-                availability: true
-            }).populate('userId');
-    
-            if (!consultant) {
-                return res.status(404).json({ error: 'No available consultant with the requested specialization(s) found' });
-            }
-    
-            // Check if the consultant is available at the specified date and time
-            const overlappingConsultation = await Consultation.findOne({
-                consultantId: consultant._id,
-                date: { $lte: new Date(new Date(date).getTime() + duration * 60000) }, // End time
-                endDate: { $gte: new Date(date) } // Start time
+
+            const feedback = new Feedback({
+                consultation: consultationId,
+                client: consultation.client,
+                consultant: consultation.consultant,
+                rating,
+                comment
             });
-    
-            if (overlappingConsultation) {
-                return res.status(409).json({ error: 'Consultant is not available at the requested time' });
-            }
-    
-            // Create the consultation with the found consultant
-            const consultation = new Consultation({
-                clientId,
-                consultantId: consultant._id,
-                serviceId,
-                date,
-                duration,
-                mode,
-                notes,
-                status: 'pending'
-            });
-    
-            await consultation.save();
-            res.status(201).redirect('/insightserenity/client/')
-            // res.status(201).json({ success: 'Consultation created successfully', consultation });
-        } catch (err) {
-            res.status(500).json({ error: err.message });
-        }
-    },
-    
-    
+            await feedback.save();
 
-    // Get all consultations
-    getAllConsultations: async (req, res) => {
-        try {
-            const consultations = await Consultation.find().populate('clientId consultantId serviceId');
-            console.log('Consultations:', consultations); // Add this line to inspect consultations
-            res.status(200).json({ consultations });
-        } catch (err) {
-            res.status(500).json({ error: err.message });
-        }
-    },
+            await Consultation.findByIdAndUpdate(consultationId, { $push: { feedback: feedback._id } });
 
-    // Get a consultation by ID
-    getConsultationById: async (req, res) => {
-        try {
-            const consultation = await Consultation.findById(req.params.id).populate('clientId consultantId serviceId');
-            if (!consultation) return res.status(404).json({ error: 'Consultation not found' });
-            res.status(200).json({ consultation });
+            res.status(201).json({ message: 'Feedback provided successfully', feedback });
         } catch (err) {
-            res.status(500).json({ error: err.message });
-        }
-    },
-
-    // Update a consultation
-    updateConsultation: async (req, res) => {
-        try {
-            const consultation = await Consultation.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true }).populate('clientId consultantId serviceId');
-            if (!consultation) return res.status(404).json({ error: 'Consultation not found' });
-            res.status(200).json({ success: 'Consultation updated successfully', consultation });
-        } catch (err) {
-            res.status(500).json({ error: err.message });
-        }
-    },
-
-    // Delete a consultation
-    deleteConsultation: async (req, res) => {
-        try {
-            const consultation = await Consultation.findByIdAndDelete(req.params.id);
-            if (!consultation) return res.status(404).json({ error: 'Consultation not found' });
-            res.status(200).redirect('/insightserenity/client/')
-            // res.status(200).json({ success: 'Consultation deleted successfully' });
-        } catch (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: 'Error providing feedback', error: err.message });
         }
     }
+
+    */
 };
-    
+
 module.exports = consultationController;
-    

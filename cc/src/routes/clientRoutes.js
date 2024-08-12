@@ -1,20 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const clientControllers = require('../consult/controllers/clientController');
-const { isAuthenticated, isClient } = require('../auth/utils/userUtils');
+const clientController = require('../consult/controllers/clientController');
+const { isAuthenticated, authorizeClient } = require('../auth/utils/userUtils');
 
-
-// Client Routes
-router.route('/')
-    .get(isAuthenticated, isClient, clientControllers.getClientProfile)
-
-// Render Edit Profile Form
-router.route('/edit')
-    .get(isAuthenticated, isClient, clientControllers.renderEditProfileForm)
-    .put(isAuthenticated, isClient, clientControllers.updateClientProfile);
-
-router.route('/rate')
-    .post(isAuthenticated, isClient, clientControllers.addRating)
-    .put(isAuthenticated, isClient, clientControllers.updateRating)
+router.get('/profile', isAuthenticated, authorizeClient, clientController.getClientProfile);
+router.put('/profile', isAuthenticated, authorizeClient, clientController.updateClientProfile);
+router.get('/consultations', isAuthenticated, authorizeClient, clientController.getClientConsultations);
+router.post('/book-consultation', isAuthenticated, authorizeClient, clientController.bookConsultation);
+router.put('/cancel-consultation/:consultationId', isAuthenticated, authorizeClient, clientController.cancelConsultation);
 
 module.exports = router;

@@ -1,34 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const consultantControllers = require('../consult/controllers/consultantController');
-const { isAuthenticated, isConsultant } = require('../auth/utils/userUtils');
+const consultantController = require('../consult/controllers/consultantController');
+const { isAuthenticated, authorizeConsultant } = require('../auth/utils/userUtils');
 
-// Consultant Routes
-router.route('/')
-    .get(isAuthenticated, isConsultant, consultantControllers.getConsultantProfile)
-
-// Consultations Routes
-router.route('/consultations')
-    .get(isAuthenticated, isConsultant, consultantControllers.getConsultations);
-
-router.route('/consultations/:id/approve')
-    .post(isAuthenticated, isConsultant, consultantControllers.approveConsultation);
-
-router.route('/consultations/:id/cancel')
-    .post(isAuthenticated, isConsultant, consultantControllers.cancelConsultation);
-
-router.route('/consultations/:id/reschedule')
-    .post(isAuthenticated, isConsultant, consultantControllers.rescheduleConsultation);
-
-// Render Edit Profile Form
-router.route('/edit')
-    .get(isAuthenticated, isConsultant, consultantControllers.renderEditProfileForm)
-    .put(isAuthenticated, isConsultant, consultantControllers.updateConsultantProfile);
-
-// Render Consultations Dashboard
-router.get('/dashboard', isAuthenticated, isConsultant, consultantControllers.renderConsultationsDashboard);
-
-// Render Consultation Details
-router.get('/consultations/:id', isAuthenticated, isConsultant, consultantControllers.renderConsultationDetails);
+router.get('/profile', isAuthenticated, authorizeConsultant, consultantController.getConsultantProfile);
+router.put('/profile', isAuthenticated, authorizeConsultant, consultantController.updateConsultantProfile);
+router.get('/consultations', isAuthenticated, authorizeConsultant, consultantController.getConsultantConsultations);
+router.get('/availability', isAuthenticated, authorizeConsultant, consultantController.getConsultantAvailability);
+router.put('/availability', isAuthenticated, authorizeConsultant, consultantController.updateConsultantAvailability);
 
 module.exports = router;

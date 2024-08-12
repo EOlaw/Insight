@@ -1,68 +1,46 @@
 const User = require('../models/userModel');
 const Consultant = require('../../consult/models/consultantModel');
 const Client = require('../../consult/models/clientModel');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
-const userControllers = {
+const userController = {
     // Register Page
     renderRegister: (req, res) => {
         try {
             const user = req.user;
-            if (user) return res.redirect('/');
+            if (user) return res.redirect('/dashboard');
             return res.status(200).render('users/register');
         } catch (err) {
-            res.status(500).send(err);
+            res.status(500).json({ message: 'Internal server error', error: err.message });
         }
     },
 
-    // Post Register
-    registerUser: async (req, res, next) => {
+    // Register User
+    registerUser: async (req, res) => {
         try {
-            console.log('Request body:', req.body);
-            const { firstname, lastname, email, role, contactNumber, profilePicture, username, password } = req.body;
-
-            // Validate email format
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                return res.status(400).json({ error: 'Invalid email format' });
+            const { username, email, password, role } = req.body;
+            const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+            
+            if (existingUser) {
+                return res.status(400).json({ message: 'Username or email already exists' });
             }
 
-            // Validate password format
-            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>/?]).{8,}$/;
-            if (!passwordRegex.test(password)) {
-                return res.status(400).json({ error: 'Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters.' });
-            }
-
-            // Validate role
-            if (!role || (role !== 'client' && role !== 'consultant')) {
-                return res.status(400).json({ error: 'Invalid role specified' });
-            }
-
-            const user = new User({ firstname, lastname, email, role, contactNumber, profilePicture, username });
-            await user.setPassword(password); // Use setPassword method provided by passport-local-mongoose to set the password
-            await user.save();
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const newUser = new User({ username, email, password: hashedPassword, role });
+            await newUser.save();
 
             if (role === 'consultant') {
-                const consultant = new Consultant({ userId: user._id });
+                const consultant = new Consultant({ user: newUser._id });
                 await consultant.save();
             } else if (role === 'client') {
-                const client = new Client({ userId: user._id });
+                const client = new Client({ user: newUser._id });
                 await client.save();
             }
 
-            req.login(user, err => {
-                if (err) return next(err);
-                // Redirect based on role
-                if (user.role === 'consultant') {
-                    res.redirect(`/consultant/`);
-                } else if (user.role === 'client') {
-                    res.redirect(`/client/`);
-                } else {
-                    res.redirect(`/`);
-                }
-            });
+            res.status(201).json({ message: 'User registered successfully' });
         } catch (err) {
-            console.log(err);
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: 'Error registering user', error: err.message });
         }
     },
 
@@ -70,133 +48,75 @@ const userControllers = {
     renderLogin: (req, res) => {
         try {
             const user = req.user;
-            if (user) return res.redirect('/');
+            if (user) return res.redirect('/dashboard');
             return res.status(200).render('users/login');
         } catch (err) {
-            res.status(500).json(err);
+            res.status(500).json({ message: 'Internal server error', error: err.message });
         }
     },
 
-    // Post Login
+    // Login User
     loginUser: async (req, res) => {
         try {
-            const user = req.user;
-            if (user.role === 'consultant') {
-                const consultant = await Consultant.findOne({ userId: user._id });
-                if (consultant) {
-                    return res.redirect(`/consultant/`);
-                }
-            } else if (user.role === 'client') {
-                const client = await Client.findOne({ userId: user._id });
-                if (client) {
-                    return res.redirect(`/client/`);
-                }
+            const { username, password } = req.body;
+            const user = await User.findOne({ username });
+
+            if (!user) {
+                return res.status(401).json({ message: 'Invalid credentials' });
             }
-            res.redirect('/insightserenity');
+
+            const isMatch = await bcrypt.compare(password, user.password);
+            if (!isMatch) {
+                return res.status(401).json({ message: 'Invalid credentials' });
+            }
+
+            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+            res.cookie('token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+
+            res.status(200).json({ message: 'Login successful', user: { id: user._id, username: user.username, role: user.role } });
         } catch (err) {
-            console.error(err);
-            res.status(500).json({ error: 'Something went wrong. Please try again.' });
+            res.status(500).json({ message: 'Error logging in', error: err.message });
         }
     },
 
-    // Logout
-    logout: (req, res) => {
-        req.logout(err => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({ error: 'Logout failed. Please try again.' });
-            }
-            res.redirect('/');
-        });
+    // Logout User
+    logoutUser: (req, res) => {
+        res.clearCookie('token');
+        res.status(200).json({ message: 'Logged out successfully' });
     },
 
-    // Get Users Profile
-    getUsers: async (req, res) => {
-        try {
-            const users = await User.find();
-            // res.status(200).json({ users });
-            res.status(200).render('users/list', { users });
-        } catch (err) {
-            res.status(400).json({ error: err.message });
-        }
-    },
-    /*
     // Get User Profile
-    getUser: async (req, res) => {
+    getUserProfile: async (req, res) => {
         try {
-            const userId = req.params.id;
-
-            // Find the user in User model
-            const user = await User.findById(userId);
-            if (!user) return res.status(404).json({ error: 'User not found' });
-
-            let profile = { user };
-
-            // Based on user's role, fetch corresponding profile from Client or Consultant model
-            if (user.role === 'consultant') {
-                const consultant = await Consultant.findOne({ userId });
-                profile = { ...profile, consultant };
-            } else if (user.role === 'client') {
-                const client = await Client.findOne({ userId });
-                profile = { ...profile, client };
+            const user = await User.findById(req.user.id).select('-password');
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
             }
-            //res.status(200).json(profile);
-            res.status(200).render('users/profile', profile);
-        } catch (error) {
-            res.status(400).json({ error });
-        }
-    },
-    */
-    // Update User Account
-    updateUserAccount: async (req, res) => {
-        try {
-            const userId = req.params.id;
-            const updateData = req.body;
-
-            // Update user in User model
-            const user = await User.findByIdAndUpdate(userId, updateData, { new: true, runValidators: true });
-            if (!user) return res.status(404).json({ error: 'User not found' });
-
-            let updatedProfile = { user };
-
-            // If client or consultant data is updated, update it in respective models
-            if (user.role === 'consultant') {
-                await Consultant.findOneAndUpdate({ userId }, updateData, { new: true, runValidators: true });
-                const consultant = await Consultant.findOne({ userId });
-                updatedProfile = { ...updatedProfile, consultant };
-            } else if (user.role === 'client') {
-                await Client.findOneAndUpdate({ userId }, updateData, { new: true, runValidators: true });
-                const client = await Client.findOne({ userId });
-                updatedProfile = { ...updatedProfile, client };
-            }
-
-            res.redirect(`/user/${user._id}`);
-        } catch (error) {
-            res.status(400).json({ error });
+            res.status(200).json(user);
+        } catch (err) {
+            res.status(500).json({ message: 'Error fetching user profile', error: err.message });
         }
     },
 
-    // Delete User Account
-    deleteUserAccount: async (req, res) => {
+    // Update User Profile
+    updateUserProfile: async (req, res) => {
         try {
-            const userId = req.params.id;
+            const { firstName, lastName, phoneNumber } = req.body;
+            const updatedUser = await User.findByIdAndUpdate(
+                req.user.id,
+                { $set: { firstName, lastName, phoneNumber } },
+                { new: true, runValidators: true }
+            ).select('-password');
 
-            // Delete user from User model
-            const user = await User.findByIdAndDelete(userId);
-            if (!user) return res.status(404).json({ error: 'User not found' });
-
-            // Delete corresponding profile from Client or Consultant model
-            if (user.role === 'consultant') {
-                await Consultant.findOneAndDelete({ userId });
-            } else if (user.role === 'client') {
-                await Client.findOneAndDelete({ userId });
+            if (!updatedUser) {
+                return res.status(404).json({ message: 'User not found' });
             }
 
-            res.redirect('/');
-        } catch (error) {
-            res.status(400).json({ error });
+            res.status(200).json({ message: 'Profile updated successfully', user: updatedUser });
+        } catch (err) {
+            res.status(500).json({ message: 'Error updating user profile', error: err.message });
         }
-    },
+    }
 };
 
-module.exports = userControllers;
+module.exports = userController;

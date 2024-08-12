@@ -1,113 +1,90 @@
-const User = require('../../auth/models/userModel')
-const Client = require('../models/clientModel');
-const Consultant = require('../models/consultantModel');
-const Consultation = require('../models/consultationModel');
-const Service = require('../models/serviceModel');
+const Client = require('../../consult/models/clientModel');
+const Consultation = require('../../consult/models/consultationModel');
 
-const clientControllers = {
-    /*
+const clientController = {
     // Get Client Profile
     getClientProfile: async (req, res) => {
         try {
-            const client = await Client.findOne({ userId: req.user._id }).populate('userId')
-            if (!client) return res.status(404).json({ error: 'Client profile not found' });
-            const consultations = await Consultation.find({ clientId: client._id }).populate('serviceId')
-            
-            res.render('clients/profile', { client, consultations})
-            // res.status(200).json({ client });
-        } catch (error) {
-            res.status(500).json({ error: error.message });
+            const client = await Client.findOne({ user: req.user.id }).populate('user', '-password');
+            if (!client) {
+                return res.status(404).json({ message: 'Client profile not found' });
+            }
+            res.status(200).json(client);
+        } catch (err) {
+            res.status(500).json({ message: 'Error fetching client profile', error: err.message });
         }
     },
-    */
-    // Get Client Profile
-    getClientProfile: async (req, res) => {
-        try {
-            const co = await Client.findOne({ userId: req.user._id }).populate('userId')
-            if (!co) return res.status(404).json({ error: 'Client profile not found' });
-            const consultations = await Consultation.find({ clientId: co._id }).populate('serviceId')
-            
-            res.render('clients/profile', { co, consultations})
-            // res.status(200).json({ client });
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
-    },
-    renderEditProfileForm: async (req, res) => {
-        try {
-            const co = await Client.findOne({ userId: req.user._id }).populate('userId');
-            if (!co) return res.status(404).json({ error: 'Client profile not found' });
-            res.status(200).render('clients/edit', { co });
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
-    },
+
     // Update Client Profile
     updateClientProfile: async (req, res) => {
         try {
-            const { firstname, lastname, email, contactNumber, profilePicture, companyName, industry, contactPerson, address, website } = req.body;
-    
-            // Update User info
-            const user = await User.findByIdAndUpdate(req.user._id, {
-                firstname,
-                lastname,
-                email,
-                contactNumber,
-                profilePicture
-            }, { new: true, runValidators: true });
-    
-            // Update Client profile
-            const client = await Client.findOneAndUpdate({ userId: req.user._id }, {
-                companyName,
-                industry,
-                contactPerson,
-                address,
-                website
-            }, { new: true, runValidators: true });
-    
-            if (!user || !client) return res.status(404).json({ error: 'Profile not found' });
-    
-            res.status(200).redirect(`/client/`);
-        } catch (error) {
-            res.status(500).json({ error: error.message });
+            const { company, industry, billingAddress, preferredServices } = req.body;
+            const updatedClient = await Client.findOneAndUpdate(
+                { user: req.user.id },
+                { $set: { company, industry, billingAddress, preferredServices } },
+                { new: true, runValidators: true }
+            ).populate('user', '-password');
+
+            if (!updatedClient) {
+                return res.status(404).json({ message: 'Client profile not found' });
+            }
+
+            res.status(200).json({ message: 'Client profile updated successfully', client: updatedClient });
+        } catch (err) {
+            res.status(500).json({ message: 'Error updating client profile', error: err.message });
         }
     },
-    // Add Rating
-    addRating: async (req, res) => {
-        try {
-            const { consultationId, rating, comments } = req.body;
-            const consultation = await Consultation.findById(consultationId);
-            if (!consultation) return res.status(404).json({ error: 'Consultation not found' });
 
-            consultation.ratings.push({
-                client: req.user._id,
-                rating,
-                comments
+    // Get Client's Consultations
+    getClientConsultations: async (req, res) => {
+        try {
+            const consultations = await Consultation.find({ client: req.user.id })
+                .populate('consultant', 'username')
+                .populate('service', 'name');
+            res.status(200).json(consultations);
+        } catch (err) {
+            res.status(500).json({ message: 'Error fetching consultations', error: err.message });
+        }
+    },
+
+    // Book a Consultation
+    bookConsultation: async (req, res) => {
+        try {
+            const { consultantId, serviceId, dateTime, duration } = req.body;
+            const newConsultation = new Consultation({
+                client: req.user.id,
+                consultant: consultantId,
+                service: serviceId,
+                dateTime,
+                duration
             });
+            await newConsultation.save();
 
-            await consultation.save();
-            res.status(200).json({ consultation });
-        } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(201).json({ message: 'Consultation booked successfully', consultation: newConsultation });
+        } catch (err) {
+            res.status(500).json({ message: 'Error booking consultation', error: err.message });
         }
     },
-    // Update Rating
-    updateRating: async (req, res) => {
+
+    // Cancel a Consultation
+    cancelConsultation: async (req, res) => {
         try {
-            const { consultationId, ratingId, rating, comments } = req.body;
-            const consultation = await Consultation.findById(consultationId);
-            if (!consultation) return res.status(404).json({ error: 'Consultation not found' });
+            const { consultationId } = req.params;
+            const consultation = await Consultation.findOneAndUpdate(
+                { _id: consultationId, client: req.user.id, status: 'scheduled' },
+                { $set: { status: 'cancelled' } },
+                { new: true }
+            );
 
-            const ratingIndex = consultation.ratings.findIndex(r => r._id.toString() === ratingId);
-            if (ratingIndex === -1) return res.status(404).json({ error: 'Rating not found' });
+            if (!consultation) {
+                return res.status(404).json({ message: 'Consultation not found or cannot be cancelled' });
+            }
 
-            consultation.ratings[ratingIndex] = { client: req.user._id, rating, comments };
-            await consultation.save();
-            res.status(200).json({ consultation });
-        } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(200).json({ message: 'Consultation cancelled successfully', consultation });
+        } catch (err) {
+            res.status(500).json({ message: 'Error cancelling consultation', error: err.message });
         }
     }
 };
 
-module.exports = clientControllers;
+module.exports = clientController;
