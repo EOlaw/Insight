@@ -1,6 +1,6 @@
 const Commit = require('../models/commitModel');
 const Repository = require('../models/repositoryModel');
-const User = require('../auth/models/userModel'); // Import User model for author reference
+const User = require('../../auth/models/userModel'); // Import User model for author reference
 
 const commitController = {
     // Create a new commit

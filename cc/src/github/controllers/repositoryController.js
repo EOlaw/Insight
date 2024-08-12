@@ -1,5 +1,5 @@
 const Repository = require('../models/repositoryModel');
-const User = require('../auth/models/userModel'); // Import User model for owner reference
+const User = require('../../auth/models/userModel'); // Import User model for owner reference
 
 const repositoryController = {
     // Create a new repository

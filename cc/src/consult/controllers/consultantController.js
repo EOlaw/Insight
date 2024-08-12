@@ -1,83 +1,210 @@
+const User = require('../../auth/models/userModel');
 const Consultant = require('../models/consultantModel');
+const Consultation = require('../models/consultationModel');
+const Service = require('../../services/serviceModel');
 
-const consultantController = {
-    // Create a new consultant
-    createConsultant: async (req, res) => {
+const consultantControllers = {
+    // Get Consultant Profile
+    getConsultantProfile: async (req, res) => {
         try {
-            const { name, specialization, bio, profilePicture } = req.body;
-
-            // Validate input
-            if (!name || !specialization || !bio) {
-                return res.status(400).json({ message: 'All fields are required' });
-            }
-
-            const consultant = new Consultant({ name, specialization, bio, profilePicture });
-            await consultant.save();
-
-            res.status(201).json({ message: 'Consultant created successfully', consultant });
+            const consultant = await Consultant.findOne({ userId: req.user._id }).populate('userId');
+            if (!consultant) return res.status(404).render('error', { err: { message: 'Consultant profile not found', statusCode: 404 } });
+            res.status(200).render('consultants/profile', { consultant });
         } catch (error) {
-            res.status(500).json({ message: 'Error creating consultant', error });
+            res.status(500).render('error', { err: { message: error.message, statusCode: 500 } });
         }
     },
 
-    // Get all consultants
-    getAllConsultants: async (req, res) => {
+    // Get All Consultations with Filter
+    getConsultations: async (req, res) => {
         try {
-            const consultants = await Consultant.find();
-            res.status(200).json(consultants);
-        } catch (error) {
-            res.status(500).json({ message: 'Error fetching consultants', error });
-        }
-    },
-
-    // Get a consultant by ID
-    getConsultantById: async (req, res) => {
-        try {
-            const { id } = req.params;
-
-            const consultant = await Consultant.findById(id);
+            const consultant = await Consultant.findOne({ userId: req.user._id });
             if (!consultant) {
-                return res.status(404).json({ message: 'Consultant not found' });
+                return res.status(404).render('error', { err: { message: 'Consultant profile not found', statusCode: 404 } });
             }
 
-            res.status(200).json(consultant);
+            const filter = { consultantId: consultant._id };
+            if (req.query.status) {
+                filter.status = req.query.status;
+            }
+
+            const consultations = await Consultation.find(filter)
+                .populate({
+                    path: 'clientId',
+                    populate: {
+                        path: 'userId',
+                        model: 'User',
+                        select: 'firstname lastname email'
+                    },
+                    select: 'companyName industry contactPerson'
+                })
+                .populate('serviceId', 'name description duration price');
+
+            res.status(200).render('consultants/consultations', { consultations, status: req.query.status });
         } catch (error) {
-            res.status(500).json({ message: 'Error fetching consultant', error });
+            res.status(500).render('error', { err: { message: error.message, statusCode: 500 } });
         }
     },
 
-    // Update a consultant by ID
-    updateConsultant: async (req, res) => {
+    // Render Edit Profile Form
+    renderEditProfileForm: async (req, res) => {
         try {
-            const { id } = req.params;
-            const updates = req.body;
-
-            const consultant = await Consultant.findByIdAndUpdate(id, updates, { new: true });
-            if (!consultant) {
-                return res.status(404).json({ message: 'Consultant not found' });
-            }
-
-            res.status(200).json({ message: 'Consultant updated successfully', consultant });
+            const consultant = await Consultant.findOne({ userId: req.user._id }).populate('userId');
+            if (!consultant) return res.status(404).json({ error: 'Consultant profile not found' });
+            res.status(200).render('consultants/edit', { consultant });
         } catch (error) {
-            res.status(500).json({ message: 'Error updating consultant', error });
+            res.status(500).json({ error: error.message });
         }
     },
 
-    // Delete a consultant by ID
-    deleteConsultant: async (req, res) => {
+    // Update Consultant Profile
+    updateConsultantProfile: async (req, res) => {
         try {
-            const { id } = req.params;
+            const { firstname, lastname, email, contactNumber, profilePicture, specializations, experienceYears, bio, certifications, linkedInProfile, availability } = req.body;
+    
+            // Update User info
+            const user = await User.findByIdAndUpdate(req.user._id, {
+                firstname,
+                lastname,
+                email,
+                contactNumber,
+                profilePicture
+            }, { new: true, runValidators: true });
+    
+            // Update Consultant profile
+            const consultant = await Consultant.findOneAndUpdate({ userId: req.user._id }, {
+                specializations: specializations.split(',').map(spec => spec.trim()),
+                experienceYears,
+                bio,
+                certifications: certifications.split(',').map(cert => cert.trim()),
+                linkedInProfile,
+                availability: availability === 'true'
+            }, { new: true, runValidators: true });
+    
+            if (!user || !consultant) return res.status(404).render('error', { err: { message: 'Profile not found', statusCode: 404 } });
+    
+            res.status(200).redirect(`/insightserenity/consultant/`);
+        } catch (error) {
+            res.status(500).render('error', { err: { message: error.message, statusCode: 500 } });
+        }
+    },
 
-            const consultant = await Consultant.findByIdAndDelete(id);
-            if (!consultant) {
-                return res.status(404).json({ message: 'Consultant not found' });
+    // Render Consultations Dashboard
+    renderConsultationsDashboard: async (req, res) => {
+        try {
+            const consultant = await Consultant.findOne({ userId: req.user._id });
+            if (!consultant) return res.status(404).json({ error: 'Consultant profile not found' });
+
+            const consultation = await Consultation.find({ consultantId: consultant._id })
+                .populate({
+                    path: 'clientId',
+                    populate: {
+                        path: 'userId',
+                        model: 'User',
+                        select: 'firstname lastname email'
+                    },
+                    select: 'companyName industry contactPerson'
+                })
+                .populate('serviceId', 'name description duration price');
+
+            res.status(200).render('consultants/consultations', { consultation });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    },
+
+    // Render Consultation Details
+    renderConsultationDetails: async (req, res) => {
+        try {
+            const consultant = await Consultant.findOne({ userId: req.user._id });
+            if (!consultant) return res.status(404).json({ error: 'Consultant profile not found' });
+
+            const consultation = await Consultation.findById(req.params.id)
+                .populate({
+                    path: 'clientId',
+                    populate: {
+                        path: 'userId',
+                        model: 'User',
+                        select: 'firstname lastname email'
+                    },
+                    select: 'companyName industry contactPerson'
+                })
+                .populate('serviceId', 'name description duration price');
+
+            if (!consultation || consultation.consultantId.toString() !== consultant._id.toString()) {
+                return res.status(404).json({ error: 'Consultation not found or you are not authorized to view this consultation' });
             }
 
-            res.status(200).json({ message: 'Consultant deleted successfully' });
+            res.status(200).render('consultants/consultationDetails', { consultation });
         } catch (error) {
-            res.status(500).json({ message: 'Error deleting consultant', error });
+            res.status(500).json({ error: error.message });
+        }
+    },
+
+    // Approve a Consultation Request
+    approveConsultation: async (req, res) => {
+        try {
+            const consultant = await Consultant.findOne({ userId: req.user._id });
+            if (!consultant) {
+                return res.status(403).render('error', { err: { message: 'You are not authorized to perform this action', statusCode: 403 } });
+            }
+
+            const consultation = await Consultation.findById(req.params.id);
+            if (!consultation || consultation.consultantId.toString() !== consultant._id.toString()) {
+                return res.status(404).render('error', { err: { message: 'Consultation not found or you are not authorized to approve this consultation', statusCode: 404 } });
+            }
+
+            consultation.status = 'approved';
+            await consultation.save();
+            res.status(200).redirect(`/insightserenity/consultant/consultations/${consultation._id}`);
+        } catch (err) {
+            res.status(500).render('error', { err: { message: err.message, statusCode: 500 } });
+        }
+    },
+
+    // Cancel a Consultation
+    cancelConsultation: async (req, res) => {
+        try {
+            const consultant = await Consultant.findOne({ userId: req.user._id });
+            if (!consultant) {
+                return res.status(403).render('error', { err: { message: 'You are not authorized to perform this action', statusCode: 403 } });
+            }
+
+            const consultation = await Consultation.findById(req.params.id);
+            if (!consultation || consultation.consultantId.toString() !== consultant._id.toString()) {
+                return res.status(404).render('error', { err: { message: 'Consultation not found or you are not authorized to cancel this consultation', statusCode: 404 } });
+            }
+
+            consultation.status = 'canceled';
+            await consultation.save();
+            res.status(200).redirect(`/insightserenity/consultant/consultations/${consultation._id}`);
+        } catch (err) {
+            res.status(500).render('error', { err: { message: err.message, statusCode: 500 } });
+        }
+    },
+
+    // Reschedule a Consultation
+    rescheduleConsultation: async (req, res) => {
+        try {
+            const consultant = await Consultant.findOne({ userId: req.user._id });
+            if (!consultant) {
+                return res.status(403).render('error', { err: { message: 'You are not authorized to perform this action', statusCode: 403 } });
+            }
+
+            const { date } = req.body;
+            const consultation = await Consultation.findById(req.params.id);
+            if (!consultation || consultation.consultantId.toString() !== consultant._id.toString()) {
+                return res.status(404).render('error', { err: { message: 'Consultation not found or you are not authorized to reschedule this consultation', statusCode: 404 } });
+            }
+
+            consultation.date = date;
+            consultation.status = 'pending'; // Set status back to pending for rescheduling
+            await consultation.save();
+            res.status(200).redirect(`/insightserenity/consultant/consultations/${consultation._id}`);
+        } catch (err) {
+            res.status(500).render('error', { err: { message: err.message, statusCode: 500 } });
         }
     }
 };
 
-module.exports = consultantController;
+module.exports = consultantControllers;

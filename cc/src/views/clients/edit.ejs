@@ -1,0 +1,78 @@
+<% layout('layouts/boilerplate') %>
+
+<!-- Header Start -->
+<div class="container-fluid bg-black py-5 mb-5 page-header">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center">
+                <h1 class="display-3 text-white animated slideInDown">Edit Profile</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-center">
+                        <li class="breadcrumb-item"><a class="text-white" href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a class="text-white" href="/client/">Client Profile</a></li>
+                        <li class="breadcrumb-item text-white active" aria-current="page">Edit Profile</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Header End -->
+
+<main id="main" style="margin-top: 100px;">
+    <div class="container">
+        <div class="section-title">
+            <h2>Edit Client Profile</h2>
+            <p>Update your information</p>
+        </div>
+
+        <form action="/client/edit?_method=PUT" method="POST">
+            <div class="row">
+                <div class="col-lg-6 mb-3">
+                    <label for="firstname" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="firstname" name="firstname" value="<%= co.userId.firstname %>" required>
+                </div>
+                <div class="col-lg-6 mb-3">
+                    <label for="lastname" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="lastname" name="lastname" value="<%= co.userId.lastname %>" required>
+                </div>
+                <div class="col-lg-6 mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" value="<%= co.userId.email %>" required>
+                </div>
+                <div class="col-lg-6 mb-3">
+                    <label for="contactNumber" class="form-label">Contact Number</label>
+                    <input type="text" class="form-control" id="contactNumber" name="contactNumber" value="<%= co.userId.contactNumber %>">
+                </div>
+                <div class="col-lg-6 mb-3">
+                    <label for="profilePicture" class="form-label">Profile Picture URL</label>
+                    <input type="text" class="form-control" id="profilePicture" name="profilePicture" value="<%= co.userId.profilePicture %>">
+                </div>
+                <div class="col-lg-6 mb-3">
+                    <label for="companyName" class="form-label">Company Name</label>
+                    <input type="text" class="form-control" id="companyName" name="companyName" value="<%= co.companyName %>">
+                </div>
+                <div class="col-lg-6 mb-3">
+                    <label for="industry" class="form-label">Industry</label>
+                    <input type="text" class="form-control" id="industry" name="industry" value="<%= co.industry %>">
+                </div>
+                <div class="col-lg-6 mb-3">
+                    <label for="contactPerson" class="form-label">Contact Person</label>
+                    <input type="text" class="form-control" id="contactPerson" name="contactPerson" value="<%= co.contactPerson %>">
+                </div>
+                <div class="col-lg-6 mb-3">
+                    <label for="address" class="form-label">Address</label>
+                    <input type="text" class="form-control" id="address" name="address" value="<%= co.address %>">
+                </div>
+                <div class="col-lg-6 mb-3">
+                    <label for="website" class="form-label">Website</label>
+                    <input type="text" class="form-control" id="website" name="website" value="<%= co.website %>">
+                </div>
+                <div class="col-12 text-center">
+                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</main>
+
