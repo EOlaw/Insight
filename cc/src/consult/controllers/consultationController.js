@@ -15,6 +15,12 @@ const consultationController = {
                 return res.status(404).json({ message: 'Consultation not found' });
             }
 
+            // Check if the requesting user is either the client or the consultant
+            if (consultation.client._id.toString() !== req.user._id.toString() && 
+                consultation.consultant._id.toString() !== req.user._id.toString()) {
+                return res.status(403).json({ message: 'Not authorized to view this consultation' });
+            }
+
             res.status(200).json(consultation);
         } catch (err) {
             res.status(500).json({ message: 'Error fetching consultation details', error: err.message });
@@ -27,7 +33,7 @@ const consultationController = {
             const { consultationId } = req.params;
             const { notes } = req.body;
             const updatedConsultation = await Consultation.findByIdAndUpdate(
-                consultationId,
+                { _id: consultationId, consultant: req.user._id },
                 { $set: { notes } },
                 { new: true, runValidators: true }
             );
@@ -47,7 +53,7 @@ const consultationController = {
         try {
             const { consultationId } = req.params;
             const updatedConsultation = await Consultation.findByIdAndUpdate(
-                consultationId,
+                { _id: consultationId, consultant: req.user._id, status: 'scheduled' },
                 { $set: { status: 'completed' } },
                 { new: true, runValidators: true }
             );

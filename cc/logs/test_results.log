@@ -1,0 +1,336 @@
+
+--- Test Run Started: 2024-08-12T20:47:48.829Z ---
+2024-08-12T20:47:48.834Z - Register Consultant: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "role": "consultant"}[39m
+Received: [31m{"message": "User registered successfully", "role": undefined}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T20:47:48.840Z - Register Client: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "role": "client"}[39m
+Received: [31m{"message": "User registered successfully", "role": undefined}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T20:47:48.841Z - User Login: FAILED - Error: req.logIn is not a function
+2024-08-12T20:47:48.845Z - Get Consultant Consultations: FAILED - Error: consultationController.getConsultantConsultations is not a function
+--- Test Run Completed: 2024-08-12T20:47:48.846Z ---
+
+
+--- Test Run Started: 2024-08-12T20:51:20.871Z ---
+2024-08-12T20:51:20.876Z - Register Consultant: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "role": "consultant"}[39m
+Received: [31m{"message": "User registered successfully", "role": undefined}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T20:51:20.882Z - Register Client: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "role": "client"}[39m
+Received: [31m{"message": "User registered successfully", "role": undefined}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T20:51:20.883Z - User Login: FAILED - Error: req.logIn is not a function
+2024-08-12T20:51:20.889Z - Get Consultant Consultations: FAILED - Error: consultationController.getConsultantConsultations is not a function
+--- Test Run Completed: 2024-08-12T20:51:20.890Z ---
+
+
+--- Test Run Started: 2024-08-12T20:52:58.660Z ---
+2024-08-12T20:52:58.665Z - Register Consultant: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "role": "consultant"}[39m
+Received: [31m{"message": "User registered successfully", "role": undefined}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T20:52:58.673Z - Register Client: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "role": "client"}[39m
+Received: [31m{"message": "User registered successfully", "role": undefined}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T20:52:58.674Z - User Login: FAILED - Error: req.logIn is not a function
+2024-08-12T20:52:58.678Z - Get Consultant Consultations: FAILED - Error: consultationController.getConsultantConsultations is not a function
+--- Test Run Completed: 2024-08-12T20:52:58.678Z ---
+
+
+--- Test Run Started: 2024-08-12T20:58:33.685Z ---
+2024-08-12T20:58:33.690Z - Register Consultant: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "user": ObjectContaining {"email": "consultant@example.com", "firstName": "John", "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": "Doe", "phoneNumber": 1234567890, "role": "consultant", "username": "newconsultant"}}[39m
+Received: [31m{"message": "User registered successfully", "role": undefined}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T20:58:33.698Z - Register Client: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "user": ObjectContaining {"email": "client@example.com", "firstName": "Jane", "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": "Doe", "phoneNumber": 9876543210, "role": "client", "username": "newclient"}}[39m
+Received: [31m{"message": "User registered successfully", "role": undefined}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T20:58:33.699Z - User Login: FAILED - Error: req.logIn is not a function
+2024-08-12T20:58:33.703Z - Get User Profile: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32m200[39m
+Received: [31m500[39m
+
+Number of calls: [31m1[39m
+--- Test Run Completed: 2024-08-12T20:58:33.704Z ---
+
+
+--- Test Run Started: 2024-08-12T21:07:32.012Z ---
+2024-08-12T21:07:32.016Z - Register Consultant: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "user": ObjectContaining {"email": "consultant@example.com", "firstName": "John", "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": "Doe", "phoneNumber": 1234567890, "role": "consultant", "username": "newconsultant"}}[39m
+Received: [31m{"message": "User registered successfully", "user": {"email": undefined, "firstName": undefined, "isAdmin": undefined, "isDeveloper": undefined, "isVerified": undefined, "lastName": undefined, "phoneNumber": undefined, "role": undefined, "username": undefined}}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T21:07:32.022Z - Register Client: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "user": ObjectContaining {"email": "client@example.com", "firstName": "Jane", "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": "Doe", "phoneNumber": 9876543210, "role": "client", "username": "newclient"}}[39m
+Received: [31m{"message": "User registered successfully", "user": {"email": undefined, "firstName": undefined, "isAdmin": undefined, "isDeveloper": undefined, "isVerified": undefined, "lastName": undefined, "phoneNumber": undefined, "role": undefined, "username": undefined}}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T21:07:32.024Z - User Login: PASSED
+2024-08-12T21:07:32.043Z - Get User Profile: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32m200[39m
+Received: [31m500[39m
+
+Number of calls: [31m1[39m
+--- Test Run Completed: 2024-08-12T21:07:32.044Z ---
+
+
+--- Test Run Started: 2024-08-12T21:12:11.916Z ---
+2024-08-12T21:12:11.921Z - Register Consultant: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "user": ObjectContaining {"email": "consultant@example.com", "firstName": "John", "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": "Doe", "phoneNumber": 1234567890, "role": "consultant", "username": "newconsultant"}}[39m
+Received: [31m{"message": "User registered successfully", "user": {"email": undefined, "firstName": undefined, "isAdmin": undefined, "isDeveloper": undefined, "isVerified": undefined, "lastName": undefined, "phoneNumber": undefined, "role": undefined, "username": undefined}}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T21:12:11.928Z - Register Client: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "user": ObjectContaining {"email": "client@example.com", "firstName": "Jane", "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": "Doe", "phoneNumber": 9876543210, "role": "client", "username": "newclient"}}[39m
+Received: [31m{"message": "User registered successfully", "user": {"email": undefined, "firstName": undefined, "isAdmin": undefined, "isDeveloper": undefined, "isVerified": undefined, "lastName": undefined, "phoneNumber": undefined, "role": undefined, "username": undefined}}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T21:12:11.929Z - User Login: PASSED
+2024-08-12T21:12:11.930Z - Get User Profile: PASSED
+--- Test Run Completed: 2024-08-12T21:12:11.934Z ---
+
+
+--- Test Run Started: 2024-08-12T21:16:13.753Z ---
+2024-08-12T21:16:13.757Z - Register Consultant: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "user": ObjectContaining {"email": "consultant@example.com", "firstName": "John", "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": "Doe", "phoneNumber": 1234567890, "role": "consultant", "username": "newconsultant"}}[39m
+Received: [31m{"message": "User registered successfully", "user": {"email": undefined, "firstName": undefined, "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": undefined, "phoneNumber": undefined, "role": undefined, "username": undefined}}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T21:16:13.764Z - Register Client: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "user": ObjectContaining {"email": "client@example.com", "firstName": "Jane", "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": "Doe", "phoneNumber": 9876543210, "role": "client", "username": "newclient"}}[39m
+Received: [31m{"message": "User registered successfully", "user": {"email": undefined, "firstName": undefined, "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": undefined, "phoneNumber": undefined, "role": undefined, "username": undefined}}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T21:16:13.765Z - User Login: PASSED
+2024-08-12T21:16:13.766Z - Get User Profile: PASSED
+--- Test Run Completed: 2024-08-12T21:16:13.767Z ---
+
+
+--- Test Run Started: 2024-08-12T21:17:39.647Z ---
+2024-08-12T21:17:39.652Z - Register Consultant: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "user": ObjectContaining {"email": "consultant@example.com", "firstName": "John", "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": "Doe", "phoneNumber": 1234567890, "role": "consultant", "username": "newconsultant"}}[39m
+Received: [31m{"message": "User registered successfully", "user": {"email": undefined, "firstName": undefined, "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": undefined, "phoneNumber": undefined, "role": undefined, "username": undefined}}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T21:17:39.658Z - Register Client: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "user": ObjectContaining {"email": "client@example.com", "firstName": "Jane", "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": "Doe", "phoneNumber": 9876543210, "role": "client", "username": "newclient"}}[39m
+Received: [31m{"message": "User registered successfully", "user": {"email": undefined, "firstName": undefined, "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": undefined, "phoneNumber": undefined, "role": undefined, "username": undefined}}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T21:17:39.659Z - User Login: PASSED
+2024-08-12T21:17:39.660Z - Get User Profile: PASSED
+--- Test Run Completed: 2024-08-12T21:17:39.661Z ---
+
+
+--- Test Run Started: 2024-08-12T21:20:56.321Z ---
+2024-08-12T21:20:56.337Z - Register Consultant: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "user": ObjectContaining {"email": "consultant@example.com", "firstName": "John", "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": "Doe", "phoneNumber": 1234567890, "role": "consultant", "username": "newconsultant"}}[39m
+Received: [31m{"message": "User registered successfully", "user": {"email": undefined, "firstName": undefined, "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": undefined, "phoneNumber": undefined, "role": undefined, "username": undefined}}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T21:20:56.344Z - Register Client: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "user": ObjectContaining {"email": "client@example.com", "firstName": "Jane", "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": "Doe", "phoneNumber": 9876543210, "role": "client", "username": "newclient"}}[39m
+Received: [31m{"message": "User registered successfully", "user": {"email": undefined, "firstName": undefined, "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": undefined, "phoneNumber": undefined, "role": undefined, "username": undefined}}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T21:20:56.346Z - User Login: PASSED
+2024-08-12T21:20:56.347Z - Get User Profile: PASSED
+--- Test Run Completed: 2024-08-12T21:20:56.347Z ---
+
+
+--- Test Run Started: 2024-08-12T21:28:50.766Z ---
+2024-08-12T21:28:50.770Z - Register Consultant: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32m201[39m
+Received: [31m500[39m
+
+Number of calls: [31m1[39m
+2024-08-12T21:28:50.776Z - User Login: PASSED
+2024-08-12T21:28:50.777Z - Get User Profile: PASSED
+--- Test Run Completed: 2024-08-12T21:28:50.777Z ---
+
+
+--- Test Run Started: 2024-08-12T21:33:41.660Z ---
+2024-08-12T21:33:41.665Z - Register Consultant: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "user": ObjectContaining {"email": "consultant@example.com", "firstName": "John", "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": "Doe", "phoneNumber": 1234567890, "role": "consultant", "username": "newconsultant"}}[39m
+Received: [31m{"error": "User.save is not a function", "message": "Error registering user"}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T21:33:41.673Z - User Login: PASSED
+2024-08-12T21:33:41.674Z - Get User Profile: PASSED
+--- Test Run Completed: 2024-08-12T21:33:41.674Z ---
+
+
+--- Test Run Started: 2024-08-12T21:34:13.019Z ---
+2024-08-12T21:34:13.035Z - Register Consultant: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32m500[39m
+Received: [31m201[39m
+
+Number of calls: [31m1[39m
+2024-08-12T21:34:13.042Z - User Login: PASSED
+2024-08-12T21:34:13.043Z - Get User Profile: PASSED
+--- Test Run Completed: 2024-08-12T21:34:13.043Z ---
+
+
+--- Test Run Started: 2024-08-12T21:34:49.506Z ---
+2024-08-12T21:34:49.523Z - Register Consultant: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "user": ObjectContaining {"email": "consultant@example.com", "firstName": "John", "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": "Doe", "phoneNumber": 1234567890, "role": "consultant", "username": "newconsultant"}}[39m
+Received: [31m{"message": "User registered successfully", "user": {"email": undefined, "firstName": undefined, "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": undefined, "phoneNumber": undefined, "role": undefined, "username": undefined}}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T21:34:49.532Z - User Login: PASSED
+2024-08-12T21:34:49.533Z - Get User Profile: PASSED
+--- Test Run Completed: 2024-08-12T21:34:49.534Z ---
+
+
+--- Test Run Started: 2024-08-12T21:39:05.841Z ---
+2024-08-12T21:39:05.857Z - Register Consultant: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32m201[39m
+Received: [31m500[39m
+
+Number of calls: [31m1[39m
+2024-08-12T21:39:05.865Z - Register Client: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32m201[39m
+Received: [31m500[39m
+
+Number of calls: [31m1[39m
+2024-08-12T21:39:05.866Z - User Login: PASSED
+2024-08-12T21:39:05.867Z - Get User Profile: PASSED
+--- Test Run Completed: 2024-08-12T21:39:05.868Z ---
+
+
+--- Test Run Started: 2024-08-12T21:39:28.401Z ---
+2024-08-12T21:39:28.416Z - Register Consultant: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "user": ObjectContaining {"email": "consultant@example.com", "firstName": "John", "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": "Doe", "phoneNumber": 1234567890, "role": "consultant", "username": "newconsultant"}}[39m
+Received: [31m{"message": "User registered successfully", "user": {"email": undefined, "firstName": undefined, "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": undefined, "phoneNumber": undefined, "role": undefined, "username": undefined}}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T21:39:28.426Z - Register Client: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "user": ObjectContaining {"email": "client@example.com", "firstName": "John", "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": "Doe", "phoneNumber": 1234567890, "role": "client", "username": "newclient"}}[39m
+Received: [31m{"message": "User registered successfully", "user": {"email": undefined, "firstName": undefined, "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": undefined, "phoneNumber": undefined, "role": undefined, "username": undefined}}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T21:39:28.427Z - User Login: PASSED
+2024-08-12T21:39:28.428Z - Get User Profile: PASSED
+--- Test Run Completed: 2024-08-12T21:39:28.429Z ---
+
+
+--- Test Run Started: 2024-08-12T21:45:09.664Z ---
+2024-08-12T21:45:09.679Z - Register Consultant: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "user": ObjectContaining {"email": "consultant@example.com", "firstName": "John", "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": "Doe", "phoneNumber": 1234567890, "role": "consultant", "username": "newconsultant"}}[39m
+Received: [31m{"message": "User registered successfully", "user": {"email": undefined, "firstName": undefined, "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": undefined, "phoneNumber": undefined, "role": undefined, "username": undefined}}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T21:45:09.687Z - Register Client: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+Expected: [32mObjectContaining {"message": "User registered successfully", "user": ObjectContaining {"email": "client@example.com", "firstName": "John", "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": "Doe", "phoneNumber": 1234567890, "role": "client", "username": "newclient"}}[39m
+Received: [31m{"message": "User registered successfully", "user": {"email": undefined, "firstName": undefined, "isAdmin": false, "isDeveloper": false, "isVerified": false, "lastName": undefined, "phoneNumber": undefined, "role": undefined, "username": undefined}}[39m
+
+Number of calls: [31m1[39m
+2024-08-12T21:45:09.691Z - User Login: PASSED
+2024-08-12T21:45:09.692Z - Get User Profile: PASSED
+--- Test Run Completed: 2024-08-12T21:45:09.693Z ---
+
+
+--- Test Run Started: 2024-08-12T21:48:13.828Z ---
+2024-08-12T21:48:13.844Z - Register Consultant: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[2m  Object {[22m
+[2m    "message": "User registered successfully",[22m
+[32m-   "user": ObjectContaining {[39m
+[32m-     "email": "consultant@example.com",[39m
+[32m-     "firstName": "John",[39m
+[31m+   "user": Object {[39m
+[31m+     "email": undefined,[39m
+[31m+     "firstName": undefined,[39m
+[2m      "isAdmin": false,[22m
+[2m      "isDeveloper": false,[22m
+[2m      "isVerified": false,[22m
+[32m-     "lastName": "Doe",[39m
+[32m-     "phoneNumber": 1234567890,[39m
+[32m-     "role": "consultant",[39m
+[32m-     "username": "newconsultant",[39m
+[31m+     "lastName": undefined,[39m
+[31m+     "phoneNumber": undefined,[39m
+[31m+     "role": undefined,[39m
+[31m+     "username": undefined,[39m
+[2m    },[22m
+[2m  }[22m,
+
+Number of calls: [31m1[39m
+2024-08-12T21:48:13.852Z - Register Client: FAILED - Error: [2mexpect([22m[31mjest.fn()[39m[2m).[22mtoHaveBeenCalledWith[2m([22m[32m...expected[39m[2m)[22m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[2m  Object {[22m
+[2m    "message": "User registered successfully",[22m
+[32m-   "user": ObjectContaining {[39m
+[32m-     "email": "client@example.com",[39m
+[32m-     "firstName": "John",[39m
+[31m+   "user": Object {[39m
+[31m+     "email": undefined,[39m
+[31m+     "firstName": undefined,[39m
+[2m      "isAdmin": false,[22m
+[2m      "isDeveloper": false,[22m
+[2m      "isVerified": false,[22m
+[32m-     "lastName": "Doe",[39m
+[32m-     "phoneNumber": 1234567890,[39m
+[32m-     "role": "client",[39m
+[32m-     "username": "newclient",[39m
+[31m+     "lastName": undefined,[39m
+[31m+     "phoneNumber": undefined,[39m
+[31m+     "role": undefined,[39m
+[31m+     "username": undefined,[39m
+[2m    },[22m
+[2m  }[22m,
+
+Number of calls: [31m1[39m
+2024-08-12T21:48:13.856Z - User Login: PASSED
+2024-08-12T21:48:13.857Z - Get User Profile: PASSED
+--- Test Run Completed: 2024-08-12T21:48:13.858Z ---
+

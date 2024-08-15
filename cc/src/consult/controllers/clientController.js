@@ -1,25 +1,42 @@
 const Client = require('../../consult/models/clientModel');
 const Consultation = require('../../consult/models/consultationModel');
 const User = require('../../auth/models/userModel');
+const mongoose = require('mongoose');
+const multer = require('multer');
+
+// Multer setup for memory storage
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 const clientController = {
     // Get Client Profile
     getClientProfile: async (req, res) => {
         try {
-            const client = await Client.findOne({ user: req.user._id }).populate('user', '-password');
-            if (!client) {
-                return res.status(404).json({ message: 'Client profile not found' });
-            }
-            res.status(200).json(client);
+            const user = await Client.findOne({ user: req.user._id }).populate('user', '-password');
+            if (!user) return res.status(404).json({ message: 'Client profile not found' });
+            const consultations = await Consultation.find({ clientId: user._id }).populate('serviceId')
+            res.status(200).render('clients/profile', { user, consultations })
+            // res.status(200).json(client);
         } catch (err) {
             res.status(500).json({ message: 'Error fetching client profile', error: err.message });
         }
     },
+    renderEditProfile: async (req, res) => {
+        try {
+            const user = await Client.findOne({ user: req.user._id }).populate('user')
+            if (!user) return res.status(404).json({ error: 'Client profile not found' });
+            res.status(200).render('clients/edit', { user })
+        } catch {
+            res.status(500).json({ error: err.message })
+        }
+    },
 
     // Update Client Profile
-    updateClientProfile: async (req, res) => {
+    updateClientProfile: [
+    upload.single('avatar'),
+    async (req, res) => {
         try {
-            const { company, industry, billingAddress, preferredServices } = req.body;
+            const { company, industry, billingAddress, preferredServices, firstName, lastName, email, phoneNumber } = req.body;
             
             // Validate input
             if (billingAddress && typeof billingAddress !== 'string') {
@@ -29,9 +46,32 @@ const clientController = {
                 return res.status(400).json({ message: 'Preferred services must be a non-empty array' });
             }
 
+            let clientUpdateData = { company, industry, billingAddress, preferredServices };
+            let userUpdateData = { firstName, lastName, email, phoneNumber };
+
+            // Handle file upload
+            if (req.file) {
+                userUpdateData['profile.avatar'] = {
+                    data: req.file.buffer.toString('base64'),
+                    contentType: req.file.mimetype
+                };
+            }
+
+            // Update User model
+            const updatedUser = await User.findByIdAndUpdate(
+                req.user._id,
+                { $set: userUpdateData },
+                { new: true, runValidators: true }
+            );
+
+            if (!updatedUser) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            // Update Client model
             const updatedClient = await Client.findOneAndUpdate(
                 { user: req.user._id },
-                { $set: { company, industry, billingAddress, preferredServices } },
+                { $set: clientUpdateData },
                 { new: true, runValidators: true }
             ).populate('user', '-password');
 
@@ -39,16 +79,20 @@ const clientController = {
                 return res.status(404).json({ message: 'Client profile not found' });
             }
 
-            res.status(200).json({ message: 'Client profile updated successfully', client: updatedClient });
+            res.status(200).redirect('/client/');
         } catch (err) {
             res.status(500).json({ message: 'Error updating client profile', error: err.message });
         }
-    },
+    }
+],
+
 
     // Get Client's Consultations
     getClientConsultations: async (req, res) => {
         try {
-            const consultations = await Consultation.find({ client: req.user._id })
+            const clientId = req.user._id;
+            const consultations = await Consultation.find({ client: clientId })
+                .populate('consultant', 'username')
                 .populate('consultant', 'username')
                 .populate('service', 'name')
                 .sort({ dateTime: -1 });  // Sort by date, most recent first
@@ -63,6 +107,7 @@ const clientController = {
     bookConsultation: async (req, res) => {
         try {
             const { consultantId, serviceId, dateTime, duration } = req.body;
+            const clientId = req.user._id;
             
             // Validate input
             if (!consultantId || !serviceId || !dateTime || !duration) {
@@ -74,7 +119,7 @@ const clientController = {
 
             // Check if consultant exists and is available
             const consultant = await User.findById(consultantId);
-            if (!consultant || consultant.role !== 'consultant') {
+            if (!consultant || consultant.role !== 'consultant' || !consultant.isEmployeeIdVerified) {
                 return res.status(404).json({ message: 'Consultant not found' });
             }
 
@@ -85,7 +130,8 @@ const clientController = {
                 consultant: consultantId,
                 service: serviceId,
                 dateTime: new Date(dateTime),
-                duration
+                duration,
+                status: 'scheduled'
             });
             await newConsultation.save();
 
@@ -99,9 +145,10 @@ const clientController = {
     cancelConsultation: async (req, res) => {
         try {
             const { consultationId } = req.params;
+            const clientId = req.user._id;
             
             const consultation = await Consultation.findOneAndUpdate(
-                { _id: consultationId, client: req.user._id, status: 'scheduled' },
+                { _id: consultationId, client: clientId, status: 'scheduled' },
                 { $set: { status: 'cancelled' } },
                 { new: true }
             );

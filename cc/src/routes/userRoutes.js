@@ -12,10 +12,14 @@ router.route('/register')
 
 router.route('/login')
     .get(userController.renderLogin)
-    .post(passport.authenticate('local', { failureFlash: true, failureRedirect: '/insightserenity/user/login' }), userController.loginUser);
+    .post(passport.authenticate('local', { failureFlash: true, failureRedirect: '/user/login' }), userController.loginUser);
 
 router.get('/logout', isAuthenticated, userController.logoutUser);
 router.get('/profile', isAuthenticated, userController.getUserProfile);
-router.put('/profile', isAuthenticated, userController.updateUserProfile);
+
+router.route('/:id')
+    // .get(isAuthenticated, userControllers.getUser)
+    .put(isAuthenticated, userController.updateUserAccount)
+    .delete(isAuthenticated, userController.deleteUserAccount)
 
 module.exports = router;

@@ -18,56 +18,126 @@
 </div>
 <!-- Header End -->
 
-<!-- ======= Register Section ======= -->
-<section class="register-section">
+<!-- Register Section -->
+<section class="register-section py-5">
     <div class="container" data-aos="fade-up">
         <div class="row justify-content-center">
-            <div class="col-lg-6">
-                <h3 class="mb-3">Create a new account</h3>
-                <p class="fst-italic mb-4">
-                    Please fill in the details to create a new account.
-                </p>
-                <form action="/user/register" method="POST" class="validated-form" novalidate>
-                    <div class="mb-3">
-                        <label for="firstname" class="form-label">First Name</label>
-                        <input type="text" class="form-control" id="firstname" name="firstname" required>
+            <div class="col-lg-8">
+                <div class="card shadow">
+                    <div class="card-body p-5">
+                        <h3 class="card-title text-center mb-4">Create Your Account</h3>
+                        <form action="/user/register" method="POST" class="validated-form" novalidate enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="firstName" class="form-label">First Name *</label>
+                                    <input type="text" class="form-control" id="firstName" name="firstName" required maxlength="50">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="lastName" class="form-label">Last Name *</label>
+                                    <input type="text" class="form-control" id="lastName" name="lastName" required maxlength="50">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="username" class="form-label">Username *</label>
+                                    <input type="text" class="form-control" id="username" name="username" required maxlength="50">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="password" class="form-label">Password *</label>
+                                    <input type="password" class="form-control" id="password" name="password" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address *</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="phoneNumber" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" pattern="\d{10}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="dateOfBirth" class="form-label">Date of Birth *</label>
+                                    <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="gender" class="form-label">Gender</label>
+                                <select class="form-select" id="gender" name="gender">
+                                    <option value="" selected disabled>Select gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="prefer not to say">Prefer not to say</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="role" class="form-label">Role *</label>
+                                <select class="form-select" id="role" name="role" required>
+                                    <option value="" selected disabled>Select role</option>
+                                    <option value="client">Client</option>
+                                    <option value="consultant">Consultant</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="avatar" class="form-label">Profile Picture</label>
+                                <div class="input-group">
+                                    <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*" onchange="previewImage(event)">
+                                    <label class="input-group-text" for="avatar">Upload</label>
+                                </div>
+                                <div id="avatarPreview" class="mt-2" style="display: none;">
+                                    <img id="preview" src="#" alt="Profile Picture Preview" class="img-thumbnail" style="max-width: 200px;">
+                                </div>
+                                <% if (user.user.profile && user.user.profile.avatar && user.user.profile.avatar.data) { %>
+                                    <div class="mt-2">
+                                        <img src="data:<%= user.user.profile.avatar.contentType %>;base64,<%= user.user.profile.avatar.data %>" 
+                                             alt="Current Profile Picture" 
+                                             class="img-thumbnail" 
+                                             style="max-width: 200px;">
+                                    </div>
+                                <% } else { %>
+                                    <div class="mt-2">
+                                        <img src="/default-avatar.png" 
+                                             alt="Default Avatar" 
+                                             class="img-thumbnail" 
+                                             style="max-width: 200px;">
+                                    </div>
+                                <% } %>
+                                <small class="form-text text-muted">Choose a profile picture (optional). Maximum file size: 5MB.</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="country" class="form-label">Country</label>
+                                <input type="text" class="form-control" id="country" name="location[country]">
+                            </div>
+                            <div class="mb-3">
+                                <label for="city" class="form-label">City</label>
+                                <input type="text" class="form-control" id="city" name="location[city]">
+                            </div>
+                            <div class="mb-3">
+                                <label for="address" class="form-label">Address</label>
+                                <input type="text" class="form-control" id="address" name="location[address]">
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">Register</button>
+                            </div>
+                        </form>
+                        <p class="text-center mt-4">Already have an account? <a href="/user/login">Login</a></p>
                     </div>
-                    <div class="mb-3">
-                        <label for="lastname" class="form-label">Last Name</label>
-                        <input type="text" class="form-control" id="lastname" name="lastname" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email address</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="role" class="form-label">Role</label>
-                        <select class="form-select" id="role" name="role" required>
-                            <option value="" disabled selected>Select your role</option>
-                            <option value="consultant">Consultant</option>
-                            <option value="client">Client</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="contactNumber" class="form-label">Contact Number</label>
-                        <input type="text" class="form-control" id="contactNumber" name="contactNumber">
-                    </div>
-                    <div class="mb-3">
-                        <label for="profilePicture" class="form-label">Profile Picture URL</label>
-                        <input type="text" class="form-control" id="profilePicture" name="profilePicture" placeholder="Enter the URL of your profile picture">
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">Register</button>
-                </form>
-                <p class="mt-3">Already have an account? <a href="/user/login">Login</a></p>
+                </div>
             </div>
         </div>
     </div>
-</section><!-- End Register Section -->
+</section>
+<!-- End Register Section -->
+
+
+<script>
+    function previewImage(event) {
+        var reader = new FileReader();
+        reader.onload = function(){
+            var output = document.getElementById('preview');
+            output.src = reader.result;
+            document.getElementById('avatarPreview').style.display = 'block';
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
+    </script>

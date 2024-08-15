@@ -19,69 +19,99 @@
 </div>
 <!-- Header End -->
 
+<!-- Main Content Start -->
+<div class="container py-5">
+    <div class="section-title">
+        <h2>Edit Consultant Profile</h2>
+        <p>Update your information</p>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">Edit Consultant Profile</h3>
+                    <form action="/consultant/edit?_method=PUT" method="POST" enctype="multipart/form-data">
+                        <div class="row g-3">
+                            <!-- User Information -->
+                            <div class="col-md-6">
+                                <label for="firstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="firstName" name="firstName" value="<%= consultant.user.firstName %>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="lastName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="lastName" name="lastName" value="<%= consultant.user.lastName %>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" value="<%= consultant.user.email %>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phoneNumber" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="<%= consultant.user.phoneNumber %>">
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label for="avatar" class="form-label">Profile Picture</label>
+                                <div class="input-group">
+                                    <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
+                                    <label class="input-group-text" for="avatar">Upload</label>
+                                </div>
+                                <% if (consultant.user.profile && consultant.user.profile.avatar && consultant.user.profile.avatar.data) { %>
+                                    <div class="mt-2">
+                                        <img src="data:<%= consultant.user.profile.avatar.contentType %>;base64,<%= consultant.user.profile.avatar.data %>" 
+                                             alt="Current Profile Picture" 
+                                             class="img-thumbnail" 
+                                             style="max-width: 200px;">
+                                    </div>
+                                <% } else { %>
+                                    <div class="mt-2">
+                                        <img src="/default-avatar.png" 
+                                             alt="Default Avatar" 
+                                             class="img-thumbnail" 
+                                             style="max-width: 200px;">
+                                    </div>
+                                <% } %>
+                                <small class="form-text text-muted">Upload a new image to change your profile picture. Leave blank to keep the current picture.</small>
+                            </div>
 
-<main id="main" style="margin-top: 100px;">
-    <div class="container">
-        <div class="section-title">
-            <h2>Edit Profile</h2>
-            <p>Update your information</p>
-        </div>
-
-        <form action="/consultant/edit?_method=PUT" method="POST">
-            <div class="row">
-                <div class="col-lg-6 mb-3">
-                    <label for="firstname" class="form-label">First Name</label>
-                    <input type="text" class="form-control" id="firstname" name="firstname" value="<%= consultant.userId.firstname %>" required>
-                </div>
-                <div class="col-lg-6 mb-3">
-                    <label for="lastname" class="form-label">Last Name</label>
-                    <input type="text" class="form-control" id="lastname" name="lastname" value="<%= consultant.userId.lastname %>" required>
-                </div>
-                <div class="col-lg-6 mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" value="<%= consultant.userId.email %>" required>
-                </div>
-                <div class="col-lg-6 mb-3">
-                    <label for="contactNumber" class="form-label">Contact Number</label>
-                    <input type="text" class="form-control" id="contactNumber" name="contactNumber" value="<%= consultant.userId.contactNumber %>">
-                </div>
-                <div class="col-lg-6 mb-3">
-                    <label for="profilePicture" class="form-label">Profile Picture URL</label>
-                    <input type="text" class="form-control" id="profilePicture" name="profilePicture" value="<%= consultant.userId.profilePicture %>">
-                </div>
-                <div class="col-lg-6 mb-3">
-                    <label for="specializations">Specializations</label>
-                    <input type="text" class="form-control" id="specializations" name="specializations" value="<%= consultant.specializations.join(', ') %>" required>
-                </div>
-                <div class="col-lg-6 mb-3">
-                    <label for="experienceYears">Years of Experience</label>
-                    <input type="number" class="form-control" id="experienceYears" name="experienceYears" value="<%= consultant.experienceYears %>">
-                </div>
-                <div class="col-lg-6 mb-3">
-                    <label for="bio">Biography</label>
-                    <textarea class="form-control" id="bio" name="bio" rows="5"><%= consultant.bio %></textarea>
-                </div>
-                <div class="col-lg-6 mb-3">
-                    <label for="certifications">Certifications</label>
-                    <input type="text" class="form-control" id="certifications" name="certifications" value="<%= consultant.certifications.join(', ') %>">
-                </div>
-                <div class="col-lg-6 mb-3">
-                    <label for="linkedInProfile">LinkedIn Profile</label>
-                    <input type="text" class="form-control" id="linkedInProfile" name="linkedInProfile" value="<%= consultant.linkedInProfile %>">
-                </div>
-                <div class="col-lg-6 mb-3">
-                    <label for="availability">Availability</label>
-                    <select class="form-control" id="availability" name="availability">
-                        <option value="true" <%= consultant.availability ? 'selected' : '' %>>Available</option>
-                        <option value="false" <%= !consultant.availability ? 'selected' : '' %>>Unavailable</option>
-                    </select>
-                </div>
-                <!-- <button type="submit" class="btn btn-primary">Save Changes</button> -->
-                <div class="col-12 text-center">
-                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                            <!-- Consultant Information -->
+                            <div class="col-md-6">
+                                <label for="specializations" class="form-label">Specializations</label>
+                                <input type="text" class="form-control" id="specializations" name="specializations" value="<%= consultant.specializations.join(', ') %>">
+                                <small class="form-text text-muted">Separate multiple specializations with commas</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="yearsOfExperience" class="form-label">Years of Experience</label>
+                                <input type="number" class="form-control" id="yearsOfExperience" name="yearsOfExperience" value="<%= consultant.yearsOfExperience %>">
+                            </div>
+                            <div class="col-12">
+                                <label for="certifications" class="form-label">Certifications</label>
+                                <textarea class="form-control" id="certifications" name="certifications" rows="3"><%= consultant.certifications.map(cert => `${cert.name} - ${cert.issuer}`).join('\n') %></textarea>
+                                <small class="form-text text-muted">Enter each certification on a new line, format: Name - Issuer</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="department" class="form-label">Department</label>
+                                <input type="text" class="form-control" id="department" name="department" value="<%= consultant.department %>">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="position" class="form-label">Position</label>
+                                <input type="text" class="form-control" id="position" name="position" value="<%= consultant.position %>">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="employeeId" class="form-label">Employee ID</label>
+                                <input type="text" class="form-control" id="employeeId" name="employeeId" value="<%= consultant.employeeId %>">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="hireDate" class="form-label">Hire Date</label>
+                                <input type="date" class="form-control" id="hireDate" name="hireDate" value="<%= consultant.hireDate.toISOString().split('T')[0] %>">
+                            </div>
+                            <div class="col-12 text-center mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg">Update Profile</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
-</main>
-
+</div>
+<!-- Main Content End -->

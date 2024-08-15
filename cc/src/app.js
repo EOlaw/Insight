@@ -69,6 +69,7 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+
 app.use(async (req, res, next) => {
     const services = await Service.find().limit(6);
     res.locals.services = services;
