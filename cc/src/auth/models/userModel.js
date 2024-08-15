@@ -12,7 +12,7 @@ const userSchema = new Schema({
   dateOfBirth: { type: Date },
   gender: { type: String, enum: [ 'male', 'female', 'prefer not to say']},
   location: { country: String, city: String, address: String, coordinates: { type: { type: String, default: 'Point' }, coordinates: { type: [Number], default: [0, 0]}}},
-  role: { type: String, enum: ['client', 'consultant'], required: true }, // User's role in the system
+  role: { type: String, enum: ['client', 'consultant'] }, // User's role in the system
   isAdmin: { type: Boolean, default: false }, // Boolean flag for admin status
   isDeveloper: { type: Boolean, default: false }, // Boolean flag for developer status
   createdAt: { type: Date, default: Date.now }, // Timestamp for user creation

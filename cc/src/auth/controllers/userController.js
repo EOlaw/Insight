@@ -18,58 +18,79 @@ const userController = {
     },
 
     registerUser: [
-        upload.single('avatar'),
+    upload.single('avatar'),
         async (req, res) => {
             try {
-                const { username, email, password, role, firstName, lastName, phoneNumber } = req.body;
+                const { username, email, password, role, firstName, lastName, phoneNumber, isAdmin, isDeveloper } = req.body;
                 
-                const validRoles = ['consultant', 'client', 'staff'];
-                if (!validRoles.includes(role)) {
-                    return res.status(400).json({ message: 'Invalid role. Must be consultant, client, or staff.' });
-                }
-        
-                const existingUser = await User.findOne({ $or: [{ username }, { email }] });
-                if (existingUser) {
-                    return res.status(400).json({ message: 'Username or email already exists' });
-                }
-        
-                const newUser = new User({ 
-                    username, 
-                    email, 
-                    role, 
-                    firstName, 
-                    lastName, 
-                    phoneNumber,
-                    profile: {
-                        avatar: req.file ? {
-                            data: req.file.buffer.toString('base64'),
-                            contentType: req.file.mimetype
-                        } : undefined
-                    }
-                });
-                
-                User.register(newUser, password, async (err, user) => {
-                    if (err) {
-                        return res.status(500).json({ message: 'Error registering user', error: err.message });
-                    }
-        
-                    try {
-                        switch (role) {
-                            case 'consultant':
-                                await new Consultant({ user: user._id }).save();
-                                break;
-                            case 'client':
-                                await new Client({ user: user._id }).save();
-                                break;
+                // Check if the user is registering as an admin or developer
+                if (isAdmin || isDeveloper) {
+                    // For admin or developer, role is not required
+                    const newUser = new User({ 
+                        username, 
+                        email, 
+                        firstName, 
+                        lastName, 
+                        phoneNumber,
+                        isAdmin: isAdmin ? true : false,
+                        isDeveloper: isDeveloper ? true : false,
+                        profile: {
+                            avatar: req.file ? {
+                                data: req.file.buffer.toString('base64'),
+                                contentType: req.file.mimetype
+                            } : undefined
                         }
-                    } catch (profileErr) {
-                        await User.findByIdAndDelete(user._id);
-                        return res.status(500).json({ message: 'Error creating user profile', error: profileErr.message });
-                    }
-        
-                    //res.status(201).json({ message: 'User registered successfully', user: userResponse });
-                    res.status(201).redirect('/')
-                });
+                    });
+
+                    User.register(newUser, password, (err, user) => {
+                        if (err) {
+                            return res.status(500).json({ message: 'Error registering user', error: err.message });
+                        }
+                        res.status(201).redirect('/');
+                    });
+                } else {
+                    // For non-admin and non-developer users, proceed with role validation
+                    const validRoles = ['consultant', 'client', 'staff'];
+                    if (!validRoles.includes(role)) return res.status(400).json({ message: 'Invalid role. Must be consultant, client, or staff.' });
+            
+                    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+                    if (existingUser) return res.status(400).json({ message: 'Username or email already exists' });
+            
+                    const newUser = new User({ 
+                        username, 
+                        email, 
+                        role, 
+                        firstName, 
+                        lastName, 
+                        phoneNumber,
+                        profile: {
+                            avatar: req.file ? {
+                                data: req.file.buffer.toString('base64'),
+                                contentType: req.file.mimetype
+                            } : undefined
+                        }
+                    });
+                    
+                    User.register(newUser, password, async (err, user) => {
+                        if (err) return res.status(500).json({ message: 'Error registering user', error: err.message });
+            
+                        try {
+                            switch (role) {
+                                case 'consultant':
+                                    await new Consultant({ user: user._id }).save();
+                                    break;
+                                case 'client':
+                                    await new Client({ user: user._id }).save();
+                                    break;
+                            }
+                        } catch (profileErr) {
+                            await User.findByIdAndDelete(user._id);
+                            return res.status(500).json({ message: 'Error creating user profile', error: profileErr.message });
+                        }
+            
+                        res.status(201).redirect('/');
+                    });
+                }
             } catch (err) {
                 res.status(500).json({ message: 'Error registering user', error: err.message });
             }
@@ -99,8 +120,8 @@ const userController = {
                 }
             }
             // If no specific role or profile found, redirect to a default page
-            // return res.redirect('/insightserenity');
-            return res.status(200).json({ message: 'Login successful', user: user });
+            return res.status(200).redirect('/');
+            // return res.status(200).json({ message: 'Login successful', user: user });
         } catch (err) {
             console.error('Error during role-based redirection:', err);
             return res.status(500).json({ message: 'Error during redirection', error: err.message });

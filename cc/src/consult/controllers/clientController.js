@@ -113,20 +113,17 @@ const clientController = {
             if (!consultantId || !serviceId || !dateTime || !duration) {
                 return res.status(400).json({ message: 'Missing required fields' });
             }
-            if (typeof duration !== 'number' || duration <= 0) {
-                return res.status(400).json({ message: 'Duration must be a positive number' });
-            }
 
             // Check if consultant exists and is available
             const consultant = await User.findById(consultantId);
-            if (!consultant || consultant.role !== 'consultant' || !consultant.isEmployeeIdVerified) {
+            if (!consultant || consultant.role !== 'consultant') {
                 return res.status(404).json({ message: 'Consultant not found' });
             }
 
             // TODO: Check consultant's availability
 
             const newConsultation = new Consultation({
-                client: req.user._id,
+                client: clientId,
                 consultant: consultantId,
                 service: serviceId,
                 dateTime: new Date(dateTime),

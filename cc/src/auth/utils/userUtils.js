@@ -99,10 +99,33 @@ function authorizeDeveloper(req, res, next) {
     }
 }
 
+// Middleware to check if user is admin or developer
+function authorizeAdminOrDeveloper(req, res, next) {
+    if (req.isAuthenticated()) {
+        User.findById(req.user._id)
+            .then((user) => {
+                if (user && (user.isAdmin || user.isDeveloper)) {
+                    next();
+                } else {
+                    console.log('User is not admin or developer. Access denied.');
+                    return res.status(403).json({ message: 'Access denied. Admin or Developer rights required.' });
+                }
+            })
+            .catch((err) => {
+                console.error('Error while checking admin or developer status:', err);
+                return res.status(500).json({ message: 'Internal Server Error' });
+            });
+    } else {
+        console.log('User is not authenticated. Authentication required.');
+        return res.status(401).json({ message: 'Authentication required' });
+    }
+}
+
 module.exports = { 
     isAuthenticated, 
     authorizeAdmin, 
     authorizeConsultant, 
     authorizeClient, 
-    authorizeDeveloper 
+    authorizeDeveloper,
+    authorizeAdminOrDeveloper 
 };

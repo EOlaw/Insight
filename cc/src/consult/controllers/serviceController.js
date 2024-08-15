@@ -1,19 +1,16 @@
+// serviceController.js
+
 const Service = require('../models/serviceModel');
 
 const serviceController = {
     // Create a new service
     createService: async (req, res) => {
         try {
-            const { name, description, category, price, duration } = req.body;
-            // Validate input
-            if (!name || !description || !category || !price || !duration) {
-                return res.status(400).json({ message: 'All fields are required' });
-            }
-            const service = new Service(req.body);
-            await service.save();
-            res.status(201).json({ success: 'Service created successfully', service });
+            const newService = new Service(req.body);
+            await newService.save();
+            res.status(201).json({ message: 'Service created successfully', service: newService });
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            res.status(400).json({ message: 'Error creating service', error: err.message });
         }
     },
 
@@ -21,9 +18,9 @@ const serviceController = {
     getAllServices: async (req, res) => {
         try {
             const services = await Service.find();
-            res.status(200).render('services/service', { services });
+            res.status(200).json(services);
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: 'Error fetching services', error: err.message });
         }
     },
 
@@ -31,32 +28,80 @@ const serviceController = {
     getServiceById: async (req, res) => {
         try {
             const service = await Service.findById(req.params.id);
-            if (!service) return res.status(404).json({ error: 'Service not found' });
-            res.status(200).render('services/serviceDetails', { service });
+            if (!service) {
+                return res.status(404).json({ message: 'Service not found' });
+            }
+            res.status(200).json(service);
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: 'Error fetching service', error: err.message });
         }
     },
 
     // Update a service
     updateService: async (req, res) => {
         try {
-            const service = await Service.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-            if (!service) return res.status(404).json({ error: 'Service not found' });
-            res.status(200).json({ success: 'Service updated successfully', service });
+            const updatedService = await Service.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+            if (!updatedService) {
+                return res.status(404).json({ message: 'Service not found' });
+            }
+            res.status(200).json({ message: 'Service updated successfully', service: updatedService });
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            res.status(400).json({ message: 'Error updating service', error: err.message });
         }
     },
 
     // Delete a service
     deleteService: async (req, res) => {
         try {
-            const service = await Service.findByIdAndDelete(req.params.id);
-            if (!service) return res.status(404).json({ error: 'Service not found' });
-            res.status(200).json({ success: 'Service deleted successfully' });
+            const deletedService = await Service.findByIdAndDelete(req.params.id);
+            if (!deletedService) {
+                return res.status(404).json({ message: 'Service not found' });
+            }
+            res.status(200).json({ message: 'Service deleted successfully' });
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: 'Error deleting service', error: err.message });
+        }
+    },
+
+    // Toggle service active status
+    toggleServiceStatus: async (req, res) => {
+        try {
+            const service = await Service.findById(req.params.id);
+            if (!service) {
+                return res.status(404).json({ message: 'Service not found' });
+            }
+            service.isActive = !service.isActive;
+            await service.save();
+            res.status(200).json({ message: 'Service status toggled successfully', isActive: service.isActive });
+        } catch (err) {
+            res.status(500).json({ message: 'Error toggling service status', error: err.message });
+        }
+    },
+
+    // Get services by category
+    getServicesByCategory: async (req, res) => {
+        try {
+            const services = await Service.find({ category: req.params.category });
+            res.status(200).json(services);
+        } catch (err) {
+            res.status(500).json({ message: 'Error fetching services by category', error: err.message });
+        }
+    },
+
+    // Search services
+    searchServices: async (req, res) => {
+        try {
+            const query = req.query.q;
+            const services = await Service.find({
+                $or: [
+                    { name: { $regex: query, $options: 'i' } },
+                    { description: { $regex: query, $options: 'i' } },
+                    { tags: { $in: [new RegExp(query, 'i')] } }
+                ]
+            });
+            res.status(200).json(services);
+        } catch (err) {
+            res.status(500).json({ message: 'Error searching services', error: err.message });
         }
     }
 };
