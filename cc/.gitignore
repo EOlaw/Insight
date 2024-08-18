@@ -1,2 +1,11 @@
 node_modules/
 .env
+src/utils/db.js
+src/utils/ExpressError.js
+src/admin
+src/auth
+src/dev
+logs
+src/routes/
+src/utils/emailService.js
+src/views/emails

@@ -87,21 +87,6 @@
                                 <div id="avatarPreview" class="mt-2" style="display: none;">
                                     <img id="preview" src="#" alt="Profile Picture Preview" class="img-thumbnail" style="max-width: 200px;">
                                 </div>
-                                <% if (user.user.profile && user.user.profile.avatar && user.user.profile.avatar.data) { %>
-                                    <div class="mt-2">
-                                        <img src="data:<%= user.user.profile.avatar.contentType %>;base64,<%= user.user.profile.avatar.data %>" 
-                                             alt="Current Profile Picture" 
-                                             class="img-thumbnail" 
-                                             style="max-width: 200px;">
-                                    </div>
-                                <% } else { %>
-                                    <div class="mt-2">
-                                        <img src="/default-avatar.png" 
-                                             alt="Default Avatar" 
-                                             class="img-thumbnail" 
-                                             style="max-width: 200px;">
-                                    </div>
-                                <% } %>
                                 <small class="form-text text-muted">Choose a profile picture (optional). Maximum file size: 5MB.</small>
                             </div>
                             <div class="mb-3">
@@ -129,7 +114,6 @@
 </section>
 <!-- End Register Section -->
 
-
 <script>
     function previewImage(event) {
         var reader = new FileReader();
@@ -140,4 +124,4 @@
         };
         reader.readAsDataURL(event.target.files[0]);
     }
-    </script>
+</script>

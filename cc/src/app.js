@@ -19,6 +19,7 @@ const Service = require('./consult/models/serviceModel');
 
 const homeRoutes = require('./routes/homeRoute');
 const userRoutes = require('./routes/userRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const clientRoutes = require('./routes/clientRoutes');
 const consultantRoutes = require('./routes/consultantRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
@@ -83,6 +84,7 @@ app.use(async (req, res, next) => {
 // Insightserenity Routes
 app.use('/', homeRoutes);
 app.use('/user', userRoutes);
+app.use('/admin', adminRoutes)
 app.use('/client', clientRoutes);
 app.use('/consultant', consultantRoutes);
 app.use('/service', serviceRoutes);

@@ -1,5 +1,27 @@
 <% layout('layouts/boilerplate') %>
 
+<style>
+    .sticky-toc {
+        position: sticky;
+        top: 80px;
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+    }
+    #toc {
+        position: relative;
+    }
+    #toc .nav-link {
+        color: #333;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    #toc .nav-link:hover, #toc .nav-link.active {
+        color: #007bff;
+        background-color: #f8f9fa;
+    }
+</style>
+
+
 <!-- Header Start -->
 <div class="container-fluid bg-black py-5 mb-5 page-header">
     <div class="container py-5">
@@ -19,135 +41,187 @@
 <!-- Header End -->
 
 <!-- Terms of Service Section -->
-<section id="terms" class="terms">
+<section id="terms" class="terms py-5">
     <div class="container" data-aos="fade-up">
-        <div class="section-title">
-            <h2>Terms of Service</h2>
-            <p>Our Terms of Service</p>
-        </div>
+        <div class="row">
+            <!-- Table of Contents -->
+            <div class="col-lg-3 mb-4">
+                <div class="sticky-toc">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Table of Contents</h5>
+                            <nav id="toc" class="nav flex-column">
+                                <a class="nav-link" href="#introduction" data-bs-toggle="collapse" data-bs-target="#collapseOne">1. Introduction</a>
+                                <a class="nav-link" href="#use-of-services" data-bs-toggle="collapse" data-bs-target="#collapseTwo">2. Use of Services</a>
+                                <a class="nav-link" href="#intellectual-property" data-bs-toggle="collapse" data-bs-target="#collapseThree">3. Intellectual Property</a>
+                                <a class="nav-link" href="#user-content" data-bs-toggle="collapse" data-bs-target="#collapseFour">4. User Content</a>
+                                <a class="nav-link" href="#privacy" data-bs-toggle="collapse" data-bs-target="#collapseFive">5. Privacy and Data Protection</a>
+                                <a class="nav-link" href="#termination" data-bs-toggle="collapse" data-bs-target="#collapseSix">6. Termination</a>
+                                <a class="nav-link" href="#liability" data-bs-toggle="collapse" data-bs-target="#collapseSeven">7. Limitation of Liability</a>
+                                <a class="nav-link" href="#governing-law" data-bs-toggle="collapse" data-bs-target="#collapseEight">8. Governing Law</a>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <div class="container">
-            <h1>Terms of Use</h1>
+            <!-- Terms Content -->
+            <div class="col-lg-9">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h2 class="card-title mb-4">InsightSerenity Terms of Service</h2>
+                        <p class="lead">Last updated: <%= new Date().toLocaleDateString() %></p>
 
-            <section>
-                <h2>Legal Information</h2>
-                <p>
-                    These Terms of Use apply to InsightSerenity's website and all associated sites linked by InsightSerenity, its subsidiaries, and affiliates. By accessing or using the Site, you agree to comply with these Terms of Use. If you disagree, please do not use the Site.
-                </p>
-                <p>
-                    InsightSerenity reserves the right to modify these Terms of Use at any time without prior notice. It is your responsibility to review these Terms periodically. Continued use of the Site after any changes will imply your acceptance of the revised Terms.
-                </p>
-            </section>
+                        <div class="accordion" id="termsAccordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="introduction">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                        1. Introduction
+                                    </button>
+                                </h2>
+                                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="introduction" data-bs-parent="#termsAccordion">
+                                    <div class="accordion-body">
+                                        <p>Welcome to InsightSerenity. These Terms of Service ("Terms") govern your access to and use of InsightSerenity's services, including our website, APIs, email notifications, applications, buttons, and widgets (the "Services"), and any information, text, graphics, photos or other materials uploaded, downloaded or appearing on the Services (collectively referred to as "Content").</p>
+                                        <p>Your access to and use of the Services are conditioned on your acceptance of and compliance with these Terms. By accessing or using the Services you agree to be bound by these Terms.</p>
+                                    </div>
+                                </div>
+                            </div>
 
-            <section>
-                <h2>Content</h2>
-                <p>
-                    All content on the Site, including but not limited to text, graphics, user interfaces, visual interfaces, photographs, trademarks, logos, sounds, music, artwork, and computer code (collectively, "Content"), is owned or licensed by InsightSerenity and is protected by applicable intellectual property laws.
-                </p>
-                <p>
-                    You may not copy, reproduce, republish, upload, post, publicly display, encode, translate, transmit, or distribute any part of the Site or the Content in any way without InsightSerenity’s express prior written consent. You may use information on InsightSerenity products and services purposely made available by InsightSerenity for downloading, provided you do not modify the information and use it solely for personal, non-commercial purposes.
-                </p>
-            </section>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="use-of-services">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                        2. Use of Services
+                                    </button>
+                                </h2>
+                                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="use-of-services" data-bs-parent="#termsAccordion">
+                                    <div class="accordion-body">
+                                        <p>You are responsible for your use of the Services, for any Content you post to the Services, and for any consequences thereof. The Content you submit, post, or display will be able to be viewed by other users of the Services and through third party services and websites.</p>
+                                        <p>You may use the Services only in compliance with these Terms and all applicable local, state, national, and international laws, rules and regulations.</p>
+                                    </div>
+                                </div>
+                            </div>
 
-            <section>
-                <h2>Your Use of the Site</h2>
-                <p>
-                    You agree to use the Site only for lawful purposes and in a manner that does not infringe the rights of, restrict or inhibit anyone else's use and enjoyment of the Site. Prohibited behavior includes harassing or causing distress or inconvenience to any other user, transmitting obscene or offensive content, or disrupting the normal flow of dialogue within the Site.
-                </p>
-                <p>
-                    You may not use the Site to distribute viruses or harmful software, engage in unauthorized access to any part of the Site or systems, use automated tools to scrape or copy content, or interfere with the Site’s operations.
-                </p>
-            </section>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="intellectual-property">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                        3. Intellectual Property
+                                    </button>
+                                </h2>
+                                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="intellectual-property" data-bs-parent="#termsAccordion">
+                                    <div class="accordion-body">
+                                        <p>The Services and their original content, features, and functionality are and will remain the exclusive property of InsightSerenity and its licensors. The Services are protected by copyright, trademark, and other laws of both the United States and foreign countries. Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of InsightSerenity.</p>
+                                    </div>
+                                </div>
+                            </div>
 
-            <section>
-                <h2>Purchases & Additional Terms</h2>
-                <p>
-                    Additional terms and conditions may apply to purchases of goods or services, and specific portions or features of the Site, including contests, promotions, or other similar features. These additional terms are incorporated into these Terms of Use by reference.
-                </p>
-                <p>
-                    If there is a conflict between these Terms of Use and the terms posted for or applicable to a specific portion of the Site, the latter terms shall control with respect to your use of that portion of the Site.
-                </p>
-                <ul>
-                    <li>Guidelines for Using InsightSerenity Trademarks & Copyrights</li>
-                    <li>Rights & Permissions</li>
-                    <li>Trademarks</li>
-                    <li>Claims of Copyright Infringement</li>
-                    <li>Piracy</li>
-                    <li>Counterfeit Products</li>
-                    <li>InsightSerenity’s Unsolicited Idea Submission Policy</li>
-                    <li>Software License Information</li>
-                    <li>Legal Contacts</li>
-                </ul>
-            </section>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="user-content">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                        4. User Content
+                                    </button>
+                                </h2>
+                                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="user-content" data-bs-parent="#termsAccordion">
+                                    <div class="accordion-body">
+                                        <p>You retain your rights to any Content you submit, post or display on or through the Services. By submitting, posting or displaying Content on or through the Services, you grant us a worldwide, non-exclusive, royalty-free license to use, copy, reproduce, process, adapt, modify, publish, transmit, display and distribute such Content in any and all media or distribution methods.</p>
+                                    </div>
+                                </div>
+                            </div>
 
-            <section>
-                <h2>Accounts & Security</h2>
-                <p>
-                    Certain features or services offered on or through the Site may require you to open an account. You are responsible for maintaining the confidentiality of your account information, including your password, and for any activities that occur under your account. You agree to notify InsightSerenity immediately of any unauthorized use of your account or password or any other breach of security.
-                </p>
-                <p>
-                    InsightSerenity will not be liable for any loss or damage arising from your failure to comply with these obligations. You may not use anyone else's InsightSerenity ID, password, or account at any time without the express permission of the holder of that InsightSerenity ID, password, or account.
-                </p>
-            </section>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="privacy">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                        5. Privacy and Data Protection
+                                    </button>
+                                </h2>
+                                <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="privacy" data-bs-parent="#termsAccordion">
+                                    <div class="accordion-body">
+                                        <p>Any information that you provide to InsightSerenity is subject to our Privacy Policy, which governs our collection and use of your information. You understand that through your use of the Services you consent to the collection and use of this information, including the transfer of this information to the United States and/or other countries for storage, processing and use by InsightSerenity.</p>
+                                    </div>
+                                </div>
+                            </div>
 
-            <section>
-                <h2>Links to Other Sites</h2>
-                <p>
-                    The Site may contain links to third-party websites or resources. These links are provided solely for your convenience and do not constitute an endorsement by InsightSerenity. InsightSerenity is not responsible for the availability or accuracy of such websites or resources, or for any content, advertising, products, or other materials on or available from such websites or resources.
-                </p>
-                <p>
-                    You acknowledge and agree that InsightSerenity shall not be responsible or liable, directly or indirectly, for any damage or loss caused or alleged to be caused by or in connection with the use of or reliance on any such content, goods, or services available on or through any such website or resource.
-                </p>
-            </section>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="termination">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                                        6. Termination
+                                    </button>
+                                </h2>
+                                <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="termination" data-bs-parent="#termsAccordion">
+                                    <div class="accordion-body">
+                                        <p>We may terminate or suspend your account and bar access to the Service immediately, without prior notice or liability, under our sole discretion, for any reason whatsoever and without limitation, including but not limited to a breach of the Terms. If you wish to terminate your account, you may simply discontinue using the Service.</p>
+                                    </div>
+                                </div>
+                            </div>
 
-            <section>
-                <h2>Disclaimer</h2>
-                <p>
-                    The Site and all content, products, and services available through the Site are provided "as is" and "as available" without warranty of any kind, express or implied, including but not limited to the implied warranties of merchantability, fitness for a particular purpose, title, and non-infringement. InsightSerenity does not warrant that the Site or any content, products, or services will be error-free or uninterrupted, or that defects will be corrected.
-                </p>
-            </section>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="liability">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+                                        7. Limitation of Liability
+                                    </button>
+                                </h2>
+                                <div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="liability" data-bs-parent="#termsAccordion">
+                                    <div class="accordion-body">
+                                        <p>In no event shall InsightSerenity, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from (i) your access to or use of or inability to access or use the Service; (ii) any conduct or content of any third party on the Service; (iii) any content obtained from the Service; and (iv) unauthorized access, use or alteration of your transmissions or content, whether based on warranty, contract, tort (including negligence) or any other legal theory, whether or not we have been informed of the possibility of such damage.</p>
+                                    </div>
+                                </div>
+                            </div>
 
-            <section>
-                <h2>Limitation of Liability</h2>
-                <p>
-                    In no event shall InsightSerenity, its affiliates, or their respective officers, directors, employees, or agents be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, or other intangible losses, arising out of or in connection with your use of the Site or any content, products, or services available through the Site, whether based on warranty, contract, tort (including negligence), or any other legal theory, even if InsightSerenity has been advised of the possibility of such damages.
-                </p>
-            </section>
-
-            <section>
-                <h2>Indemnification</h2>
-                <p>
-                    You agree to indemnify, defend, and hold harmless InsightSerenity, its affiliates, and their respective officers, directors, employees, and agents, from and against any and all claims, liabilities, damages, losses, costs, and expenses, including reasonable attorneys’ fees, arising out of or in any way connected with your access to or use of the Site or any content, products, or services available through the Site, your violation of these Terms of Use, or your violation of any rights of another party.
-                </p>
-            </section>
-
-            <section>
-                <h2>Termination</h2>
-                <p>
-                    InsightSerenity reserves the right, at its sole discretion, to terminate or suspend your access to all or part of the Site with or without notice for any reason, including without limitation, breach of these Terms of Use. Upon termination, you must cease all use of the Site and destroy any downloaded materials in your possession.
-                </p>
-            </section>
-
-            <section>
-                <h2>Governing Law</h2>
-                <p>
-                    These Terms of Use and your use of the Site shall be governed by and construed in accordance with the laws of the State of [Your State], without regard to its conflict of law principles. Any legal action or proceeding arising under or in connection with these Terms of Use shall be brought exclusively in the courts located in [Your County], [Your State], and you hereby consent to the personal jurisdiction and venue of such courts.
-                </p>
-            </section>
-
-            <section>
-                <h2>Contact Information</h2>
-                <p>
-                    For any questions about these Terms of Use, please contact us at:
-                    <br>
-                    <strong>InsightSerenity</strong><br>
-                    [Your Address]<br>
-                    [City, State, ZIP Code]<br>
-                    Email: [Your Email Address]<br>
-                    Phone: [Your Phone Number]
-                </p>
-            </section>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="governing-law">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
+                                        8. Governing Law
+                                    </button>
+                                </h2>
+                                <div id="collapseEight" class="accordion-collapse collapse" aria-labelledby="governing-law" data-bs-parent="#termsAccordion">
+                                    <div class="accordion-body">
+                                        <p>These Terms shall be governed and construed in accordance with the laws of [Your State], United States, without regard to its conflict of law provisions. Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights.</p>
+                                        <p>If any provision of these Terms is held to be invalid or unenforceable by a court, the remaining provisions of these Terms will remain in effect. These Terms constitute the entire agreement between us regarding our Service, and supersede and replace any prior agreements we might have had between us regarding the Service.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
         </div>
     </div>
 </section>
 <!-- End Terms of Service Section -->
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Smooth scrolling and accordion opening for table of contents
+        document.querySelectorAll('#toc a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                // Smooth scroll to the target element
+                targetElement.scrollIntoView({
+                    behavior: 'smooth'
+                });
+
+                // Open the corresponding accordion item
+                const collapseElement = bootstrap.Collapse.getInstance(document.querySelector(this.getAttribute('data-bs-target')));
+                if (collapseElement) {
+                    collapseElement.show();
+                }
+            });
+        });
+
+        // Highlight active section in table of contents
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const id = entry.target.getAttribute('id');
+                if (entry.intersectionRatio > 0) {
+                    document.querySelector(`#toc a[href="#${id}"]`).classList.add('active');
+                } else {
+                    document.querySelector(`#toc a[href="#${id}"]`).classList.remove('active');
+                }
+            });
+        }, { threshold: 0.5 });
+
+        // Track all sections that have an `id` applied
+        document.querySelectorAll('.accordion-item').forEach((section) => {
+            observer.observe(section);
+        });
+    });
+</script>

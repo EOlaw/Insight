@@ -20,116 +20,197 @@
 <!-- Header End -->
 
 <!-- Service Details Section -->
-<section id="service-details" class="service-details">
+<section id="service-details" class="service-details py-5">
     <div class="container" data-aos="fade-up">
         <div class="row">
             <div class="col-lg-8">
-                <div class="card mb-4">
+                <div class="card mb-4 shadow-sm">
                     <div class="card-body">
-                        <% if (service.image > 0) { %>
-                            <img src="<%= service.image[0].url %>" class="card-img-top product-image" alt="<%= service.name %>">
+                        <% if (service.imageUrl) { %>
+                            <img src="<%= service.imageUrl %>" class="card-img-top mb-4 rounded" alt="<%= service.name %>">
                         <% } else { %>
-                            <img src="https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg" class="card-img-top product-image" alt="Product Image">
+                            <img src="https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg" class="card-img-top mb-4 rounded" alt="Default Service Image">
                         <% } %>
-                        <h2 class="card-title"><%= service.name %></h2>
+                        <h2 class="card-title mb-4"><%= service.name %></h2>
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <span class="badge badge-info"><i class="fas fa-calendar-alt"></i> <%= service.duration %> minutes</span>
-                            <span class="badge badge-success"><i class="fas fa-dollar-sign"></i> $<%= service.price.toFixed(2) %></span>
-                            <span class="badge badge-primary"><i class="fas fa-tags"></i> <%= service.category %></span>
+                            <span class="badge bg-primary"><i class="bi bi-clock"></i> <%= service.duration %> minutes</span>
+                            <span class="badge bg-success"><i class="bi bi-currency-dollar"></i> <%= service.formattedPrice %></span>
+                            <span class="badge bg-info"><i class="bi bi-tag"></i> <%= service.category %></span>
                         </div>
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" id="information-tab" data-toggle="tab" href="#information" role="tab" aria-controls="information" aria-selected="true">Information</a>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">Overview</button>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="curriculum-tab" data-toggle="tab" href="#curriculum" role="tab" aria-controls="curriculum" aria-selected="false">Curriculum</a>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="false">Details</button>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="reviews-tab" data-toggle="tab" href="#reviews" role="tab" aria-controls="reviews" aria-selected="false">Reviews</a>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab" aria-controls="reviews" aria-selected="false">Reviews</button>
                             </li>
                         </ul>
-                        <div class="tab-content" id="myTabContent">
-                            <div class="tab-pane fade show active" id="information" role="tabpanel" aria-labelledby="information-tab">
-                                <p class="mt-3"><%= service.description || 'No description available' %></p>
+                        <div class="tab-content mt-3" id="myTabContent">
+                            <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+                                <h5>Description</h5>
+                                <p><%= service.description || 'No description available' %></p>
+                                <% if (service.shortDescription) { %>
+                                    <h5>Short Description</h5>
+                                    <p><%= service.shortDescription %></p>
+                                <% } %>
                             </div>
-                            <div class="tab-pane fade" id="curriculum" role="tabpanel" aria-labelledby="curriculum-tab">
-                                <p class="mt-3">Curriculum details go here.</p>
+                            <div class="tab-pane fade" id="details" role="tabpanel" aria-labelledby="details-tab">
+                                <h5>Service Details</h5>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Price Model
+                                        <span><%= service.priceModel %></span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Availability
+                                        <span>
+                                            <%= service.availableOnline ? 'Online' : '' %>
+                                            <%= service.availableOnline && service.availableInPerson ? ' & ' : '' %>
+                                            <%= service.availableInPerson ? 'In Person' : '' %>
+                                        </span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Minimum Notice Time
+                                        <span><%= service.minimumNoticeTime %> hours</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Cancellation Policy
+                                        <span><%= service.cancellationPolicy %></span>
+                                    </li>
+                                </ul>
+                                <% if (service.prerequisites && service.prerequisites.length > 0) { %>
+                                    <h5 class="mt-3">Prerequisites</h5>
+                                    <ul>
+                                        <% service.prerequisites.forEach(function(prerequisite) { %>
+                                            <li><%= prerequisite %></li>
+                                        <% }); %>
+                                    </ul>
+                                <% } %>
+                                <% if (service.additionalOptions && service.additionalOptions.length > 0) { %>
+                                    <h5 class="mt-3">Additional Options</h5>
+                                    <ul class="list-group">
+                                        <% service.additionalOptions.forEach(function(option) { %>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <%= option.name %>
+                                                <span class="badge bg-primary rounded-pill">$<%= option.price.toFixed(2) %></span>
+                                            </li>
+                                        <% }); %>
+                                    </ul>
+                                <% } %>
                             </div>
                             <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
-                                <p class="mt-3">Reviews go here.</p>
+                                <% if (service.rating && service.rating.count > 0) { %>
+                                    <h5>Rating</h5>
+                                    <div class="mb-3">
+                                        <% for (let i = 1; i <= 5; i++) { %>
+                                            <i class="bi <%= i <= Math.round(service.rating.average) ? 'bi-star-fill' : 'bi-star' %> text-warning"></i>
+                                        <% } %>
+                                        <span class="ms-2"><%= service.rating.average.toFixed(1) %> out of 5 (<%= service.rating.count %> reviews)</span>
+                                    </div>
+                                <% } else { %>
+                                    <p>No reviews available for this service yet.</p>
+                                <% } %>
                             </div>
                         </div>
-                        <a href="/booking/<%= service._id %>" class="btn btn-primary btn-block mt-4">Book Now</a>
+                        <a href="/booking/<%= service._id %>" class="btn btn-primary btn-lg mt-4 w-100">Book Now</a>
                     </div>
                 </div>
             </div>
 
             <div class="col-lg-4">
-                <div class="card mb-4">
+                <div class="card mb-4 shadow-sm">
                     <div class="card-body">
-                        <h5 class="card-title">Free Service Details</h5>
-                        <ul class="list-unstyled">
-                            <li><strong>Name</strong>: <%= service.name %> </li>
+                        <h5 class="card-title">Quick Information</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Category
+                                <span class="badge bg-primary rounded-pill"><%= service.category %></span>
+                            </li>
+                            <% if (service.subCategory) { %>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Sub-category
+                                    <span class="badge bg-secondary rounded-pill"><%= service.subCategory %></span>
+                                </li>
+                            <% } %>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Duration
+                                <span><%= service.duration %> minutes</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Price
+                                <span><%= service.formattedPrice %></span>
+                            </li>
                         </ul>
                     </div>
                 </div>
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Our Popular Services</h5>
-                        <ul class="list-unstyled">
-                            <% services.slice(0, 5).forEach(function(service) { %>
-                                <li><%= service.name %></li>
-                            <% }); %>
-                        </ul>
+                <% if (service.faqs && service.faqs.length > 0) { %>
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">FAQs</h5>
+                            <div class="accordion" id="faqAccordion">
+                                <% service.faqs.forEach(function(faq, index) { %>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="heading<%= index %>">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<%= index %>" aria-expanded="false" aria-controls="collapse<%= index %>">
+                                                <%= faq.question %>
+                                            </button>
+                                        </h2>
+                                        <div id="collapse<%= index %>" class="accordion-collapse collapse" aria-labelledby="heading<%= index %>" data-bs-parent="#faqAccordion">
+                                            <div class="accordion-body">
+                                                <%= faq.answer %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">All Categories</h5>
-                        <% let categories = new Set(); %>
-                        <% services.forEach(function(service) { %>
-                            <% categories.add(service.category); %>
-                        <% }); %>
-                        <ul class="list-unstyled">
-                            <% categories.forEach(function(category) { %>
-                                <li><%= category %></li>
-                            <% }); %>
-                        </ul>
-                    </div>
-                </div>
+                <% } %>
             </div>
         </div>
     </div>
 </section>
 <!-- End Service Details Section -->
 
-<!-- ======= Services Section ======= -->
-<section id="services" class="services">
+<!-- ======= Related Services Section ======= -->
+<section id="related-services" class="services py-5 bg-light">
     <div class="container" data-aos="fade-up">
-        <div class="section-title">
-            <h2>Related Services</h2>
-        </div>
-        <% if (services.length > 0) { %>
-            <div class="row">
-                <% services.slice(0, 3).forEach(function(service, index) { %>
-                    <div class="col-lg-4 col-md-6 d-flex align-items-stretch mt-4" data-aos="zoom-in" data-aos-delay="<%= (index + 1) * 100 %>">
-                        <div class="icon-box">
-                            <div class="icon"><i class="bx bx-briefcase"></i></div>
-                            <h4><a href="/service/<%= service._id %>"><%= service.name %></a></h4>
-                            <p><%= service.description || 'No description available' %></p>
-                            <p><strong>Duration:</strong> <%= service.duration %> minutes</p>
-                            <p><strong>Price:</strong> $<%= service.price.toFixed(2) %></p>
-                            <p><strong>Category:</strong> <%= service.category %></p>
+        <h2 class="text-center mb-5">Related Services</h2>
+        <% if (services && services.length > 0) { %>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <% services.slice(0, 3).forEach(function(relatedService) { %>
+                    <div class="col">
+                        <div class="card h-100 shadow-sm">
+                            <% if (relatedService.imageUrl) { %>
+                                <img src="<%= relatedService.imageUrl %>" class="card-img-top" alt="<%= relatedService.name %>">
+                            <% } else { %>
+                                <div class="card-img-top bg-light text-center py-5">
+                                    <i class="bi bi-briefcase" style="font-size: 3rem;"></i>
+                                </div>
+                            <% } %>
+                            <div class="card-body">
+                                <h5 class="card-title"><%= relatedService.name %></h5>
+                                <p class="card-text"><%= relatedService.shortDescription || relatedService.description.substring(0, 100) + '...' %></p>
+                            </div>
+                            <div class="card-footer">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-primary"><%= relatedService.duration %> min</span>
+                                    <span class="badge bg-success"><%= relatedService.formattedPrice %></span>
+                                </div>
+                                <a href="/service/<%= relatedService._id %>" class="btn btn-outline-primary btn-sm mt-2 w-100">View Details</a>
+                            </div>
                         </div>
                     </div>
                 <% }); %>
             </div>
         <% } else { %>
             <div class="alert alert-info text-center">
-                <h4>No services available at the moment</h4>
-                <p>We are working hard to add more services soon. Please check back later!</p>
+                <p>No related services available at the moment.</p>
             </div>
         <% } %>
     </div>
-</section><!-- End Services Section -->
-
+</section>
+<!-- End Related Services Section -->

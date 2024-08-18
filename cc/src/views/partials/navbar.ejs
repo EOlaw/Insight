@@ -1,54 +1,67 @@
+<style>
+  .dropdown-toggle::after {
+    display: none;
+  }
+  .dropdown-toggle img {
+    object-fit: cover;
+  }
+  .dropdown-menu {
+    margin-top: 0.5rem;
+  }
+  .dropdown-item i {
+    width: 1rem;
+    text-align: center;
+  }
+  .welcome-text {
+    color: white;
+  }
+</style>
+
 <header id="header" class="fixed-top">
-  <div class="container d-flex align-items-center justify-content-lg-between">
-    <h1 class="logo me-auto me-lg-0"><a href="/">IS<span>.</span></a></h1>
-    <nav id="navbar" class="navbar order-last order-lg-0">
-      <ul>
-        <li><a class="nav-link scrollto active" href="/">Home</a></li>
+  <div class="container d-flex align-items-center justify-content-between">
+    <h1 class="logo"><a href="/">IS<span>.</span></a></h1>
+    
+    <nav id="navbar" class="navbar">
+      <ul class="d-flex align-items-center justify-content-center w-100">
+        <li><a class="nav-link scrollto" href="/">Home</a></li>
         <li><a class="nav-link scrollto" href="/about">About</a></li>
         <li><a class="nav-link scrollto" href="/service/">Services</a></li>
         <li><a class="nav-link scrollto" href="/team">Team</a></li>
         <li><a class="nav-link scrollto" href="/contact">Contact</a></li>
-        <% if (currentUser) { %>
-          <% if (currentUser.role === 'consultant') { %>
-            <li class="dropdown"><a href="#"><span>Welcome to Insightserenity, <%= currentUser.firstname %> <%= currentUser.lastname %></span> <i class="bi bi-chevron-down"></i></a>
-              <ul>
-                <li><a href="/consultant/">Profile</a></li>
-                <li class="dropdown"><a href="#"><span>Help & Support</span> <i class="bi bi-chevron-right"></i></a>
-                  <ul>
-                    <li><a href="#">Help Center</a></li>
-                    <li><a href="#">Support Inbox</a></li>
-                    <li><a href="#">Report a problem</a></li>
-                    <li><a href="#">Terms & Policies</a></li>
-                  </ul>
-                </li>
-                <li><a href="#">Settings & Privacy</a></li>
-                <li><a href="/user/logout" class="text-danger">Logout</a></li>
-              </ul>
-            </li>
-          <% } else if (currentUser.role === 'client') { %>
-            <li class="dropdown"><a href="#"><span>Welcome to Insightserenity, <%= currentUser.firstname %> <%= currentUser.lastname %></span> <i class="bi bi-chevron-down"></i></a>
-              <ul>
-                <li><a href="/client/">Profile</a></li>
-                <li class="dropdown"><a href="#"><span>Help & Support</span> <i class="bi bi-chevron-right"></i></a>
-                  <ul>
-                    <li><a href="#">Help Center</a></li>
-                    <li><a href="#">Support Inbox</a></li>
-                    <li><a href="#">Report a problem</a></li>
-                    <li><a href="#">Terms & Policies</a></li>
-                  </ul>
-                </li>
-                <li><a href="#">Settings & Privacy</a></li>
-                <li><a href="/user/logout" class="text-danger">Logout</a></li>
-              </ul>
-            </li>
-          <% } %>
-        <% } %>
       </ul>
-      <i class="bi bi-list mobile-nav-toggle"></i>
     </nav><!-- .navbar -->
-    <% if (!currentUser) { %>
-      <a href="/user/login" class="get-started-btn scrollto">Login</a>
-      <a href="/user/register" class="get-started-btn scrollto">Get Started</a>
-    <% } %>
+
+    <div class="d-flex align-items-center">
+      <% if (currentUser) { %>
+        <div class="dropdown">
+          <button class="btn btn-black dropdown-toggle d-flex align-items-center" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <% if (currentUser.profile && currentUser.profile.avatar && currentUser.profile.avatar.data) { %>
+              <img src="data:<%= currentUser.profile.avatar.contentType %>;base64,<%= currentUser.profile.avatar.data %>"
+                   alt="Profile Picture" 
+                   class="rounded-circle me-2"
+                   width="32" height="32">
+            <% } else { %>
+              <img src="/default-avatar.png" 
+                   alt="Default Profile Picture" 
+                   class="rounded-circle me-2"
+                   width="32" height="32">
+            <% } %>
+            <span class="welcome-text">Welcome, <%= currentUser.firstName %></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <li><a class="dropdown-item" href="/<%= currentUser.role %>/"><i class="bi bi-person-circle me-2"></i>Profile</a></li>
+            <li><a class="dropdown-item" href="#"><i class="bi bi-question-circle me-2"></i>Help & Support</a></li>
+            <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings & Privacy</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="/user/logout"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      <% } else { %>
+        <a href="/user/login" class="get-started-btn scrollto me-2">Login</a>
+        <a href="/user/register" class="get-started-btn scrollto">Get Started</a>
+      <% } %>
+    </div>
+
+    <i class="bi bi-list mobile-nav-toggle d-lg-none"></i>
   </div>
 </header>

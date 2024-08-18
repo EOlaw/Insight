@@ -11,10 +11,14 @@ const upload = multer({ storage: storage });
 
 const userController = {
     renderRegister: (req, res) => {
-        if (req.isAuthenticated()) {
-            return res.redirect('/');
+        try {
+            if (req.isAuthenticated()) {
+                return res.redirect('/');
+            }
+            return res.status(200).render('users/register');
+        } catch (err) {
+            res.status(500).send(err);
         }
-        res.status(200).render('users/register');
     },
 
     registerUser: [

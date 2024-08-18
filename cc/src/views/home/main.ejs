@@ -1,35 +1,14 @@
 <% layout('layouts/boilerplate') %>
 
-<style>
-  .btn-yellow {
-    background-color: #FFD700; /* Gold color */
-    border: none;
-    color: #000; /* Black text */
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    transition-duration: 0.4s;
-}
-
-.btn-yellow:hover {
-    background-color: #ffcc00; /* Darker yellow on hover */
-}
-</style>
-<!-- ======= Hero Section ======= -->
+<!-- Hero Section -->
 <section id="hero" class="d-flex align-items-center justify-content-center">
   <div class="container" data-aos="fade-up">
-
     <div class="row justify-content-center" data-aos="fade-up" data-aos-delay="150">
       <div class="col-xl-6 col-lg-8">
         <h1>InsightSerenity<span>.</span></h1>
         <h2>Premier IT and Data Science Consulting Services</h2>
       </div>
     </div>
-
     <div class="row gy-4 mt-5 justify-content-center" data-aos="zoom-in" data-aos-delay="250">
       <div class="col-xl-2 col-md-4">
         <div class="icon-box">
@@ -44,247 +23,214 @@
         </div>
       </div>
     </div>
-
   </div>
-</section><!-- End Hero -->
+</section>
 
 <main id="main">
-
-    <!-- ======= About Section ======= -->
-    <section id="about" class="about">
-      <div class="container" data-aos="fade-up">
-
-        <div class="row">
-          <div class="col-lg-6 order-1 order-lg-2" data-aos="fade-left" data-aos-delay="100">
-            <img src="lib/img/about.jpg" class="img-fluid" alt="About Us">
-          </div>
-          <div class="col-lg-6 pt-4 pt-lg-0 order-2 order-lg-1 content" data-aos="fade-right" data-aos-delay="100">
-            <h3>Empowering You with Insightful Consultancy</h3>
-            <p class="fst-italic">
-              At InsightSerenity, we are dedicated to providing top-tier consultancy services, leveraging our deep expertise in IT, data science, and life literacy coaching. Established by Emmanuel Oyemosu in 2023, our firm is built on the principles of excellence, integrity, and impactful guidance.
-            </p>
-            <ul>
-              <li><i class="ri-check-double-line"></i> Expert IT and data science consulting to drive your business forward.</li>
-              <li><i class="ri-check-double-line"></i> Life literacy coaching rooted in biblical principles for personal and professional growth.</li>
-              <li><i class="ri-check-double-line"></i> Commitment to delivering tailored solutions and unparalleled support to our clients.</li>
-            </ul>
-            <p>
-              With a mission to empower individuals and organizations alike, InsightSerenity blends cutting-edge technology with deep-seated values to offer solutions that are not only effective but also transformative. Join us on a journey of insight, serenity, and success.
-            </p>
-          </div>
+  <!-- About Section -->
+  <section id="about" class="about">
+    <div class="container" data-aos="fade-up">
+      <div class="row">
+        <div class="col-lg-6 order-1 order-lg-2" data-aos="fade-left" data-aos-delay="100">
+          <img src="lib/img/about.jpg" class="img-fluid" alt="About Us">
         </div>
-
-      </div>
-    </section>
-    <!-- End About Section -->
-
-    <!-- ======= Services Section ======= -->
-    <section id="services" class="services">
-      <div class="container" data-aos="fade-up">
-
-          <div class="section-title">
-              <h2>Our Powerful Services</h2>
-              <p>Transform Your Life and Business with Our Expertise</p>
-          </div>
-
+        <div class="col-lg-6 pt-4 pt-lg-0 order-2 order-lg-1 content" data-aos="fade-right" data-aos-delay="100">
+          <h3>Empowering You with Insightful Consultancy</h3>
           <p class="fst-italic">
-              At InsightSerenity, we offer a range of services designed to empower you with the tools and knowledge needed for personal and professional success. Our consultancy is not just about providing solutions; it's about transforming potential into reality. With our comprehensive approach, we ensure that every client receives tailored, impactful guidance that drives meaningful results.
+            At InsightSerenity, we are dedicated to providing top-tier consultancy services, leveraging our deep expertise in IT, data science, and life literacy coaching. Established by Emmanuel Oyemosu in 2023, our firm is built on the principles of excellence, integrity, and impactful guidance.
           </p>
+          <ul>
+            <li><i class="ri-check-double-line"></i> Expert IT and data science consulting to drive your business forward.</li>
+            <li><i class="ri-check-double-line"></i> Life literacy coaching rooted in biblical principles for personal and professional growth.</li>
+            <li><i class="ri-check-double-line"></i> Commitment to delivering tailored solutions and unparalleled support to our clients.</li>
+          </ul>
           <p>
-              Whether you're looking to enhance your IT infrastructure, harness the power of data science, or seek life literacy coaching rooted in biblical principles, our team is dedicated to delivering excellence. Our services are designed to meet your unique needs, helping you navigate challenges, seize opportunities, and achieve your goals with confidence and clarity.
+            With a mission to empower individuals and organizations alike, InsightSerenity blends cutting-edge technology with deep-seated values to offer solutions that are not only effective but also transformative. Join us on a journey of insight, serenity, and success.
           </p>
-
-          <% if (services.length > 0) { %>
-              <div class="row">
-                  <% services.forEach(service => { %>
-                      <div class="col-lg-4 col-md-6 d-flex align-items-stretch mt-4" data-aos="zoom-in" data-aos-delay="<%= (services.indexOf(service) + 1) * 100 %>">
-                          <div class="icon-box">
-                              <div class="icon"><i class="bx bx-briefcase"></i></div>
-                              <h4><a href="/insightserenity/service/<%= service._id %>"><%= service.name %></a></h4>
-                              <p><%= service.description || 'No description available' %></p>
-                              <p><strong>Duration:</strong> <%= service.duration %> minutes</p>
-                              <p><strong>Price:</strong> $<%= service.price.toFixed(2) %></p>
-                              <p><strong>Category:</strong> <%= service.category %></p>
-                          </div>
-                      </div>
-                  <% }) %>
-              </div>
-              <% if (services.length > 5) { %>
-                <div class="text-end mt-4">
-                    <a href="/insightserenity/service" class="btn btn-yellow">View More Services</a>
-                </div>
-            <% } %>
-          <% } else { %>
-              <div class="alert alert-info text-center">
-                  <h4>No services available at the moment</h4>
-                  <p>We are working hard to add more services soon. Please check back later!</p>
-              </div>
-          <% } %>
-
+        </div>
       </div>
-    </section>
-    <!-- End Services Section -->
+    </div>
+  </section>
 
-    <!-- ======= Team Section ======= -->
-    <section id="team" class="team">
-      <div class="container" data-aos="fade-up">
-
-        <div class="section-title">
-          <h2>Team</h2>
-          <p>Check our Team</p>
-        </div>
-
-        <div class="row">
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
-            <div class="member" data-aos="fade-up" data-aos-delay="100">
-              <div class="member-img">
-                <img src="lib/img/team/ceo.jpeg" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-twitter"></i></a>
-                  <a href=""><i class="bi bi-facebook"></i></a>
-                  <a href=""><i class="bi bi-instagram"></i></a>
-                  <a href=""><i class="bi bi-linkedin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Emmanuel Oyemosu</h4>
-                <span>Chief Executive Officer</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
-            <div class="member" data-aos="fade-up" data-aos-delay="200">
-              <div class="member-img">
-                <img src="lib/img/team/team-2.jpg" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-twitter"></i></a>
-                  <a href=""><i class="bi bi-facebook"></i></a>
-                  <a href=""><i class="bi bi-instagram"></i></a>
-                  <a href=""><i class="bi bi-linkedin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Sarah Jhonson</h4>
-                <span>Product Manager</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
-            <div class="member" data-aos="fade-up" data-aos-delay="300">
-              <div class="member-img">
-                <img src="lib/img/team/team-3.jpg" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-twitter"></i></a>
-                  <a href=""><i class="bi bi-facebook"></i></a>
-                  <a href=""><i class="bi bi-instagram"></i></a>
-                  <a href=""><i class="bi bi-linkedin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>William Anderson</h4>
-                <span>CTO</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
-            <div class="member" data-aos="fade-up" data-aos-delay="400">
-              <div class="member-img">
-                <img src="lib/img/team/team-4.jpg" class="img-fluid" alt="">
-                <div class="social">
-                  <a href=""><i class="bi bi-twitter"></i></a>
-                  <a href=""><i class="bi bi-facebook"></i></a>
-                  <a href=""><i class="bi bi-instagram"></i></a>
-                  <a href=""><i class="bi bi-linkedin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Amanda Jepson</h4>
-                <span>Accountant</span>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
+  <!-- Services Section -->
+  <section id="services" class="services">
+    <div class="container" data-aos="fade-up">
+      <div class="section-title">
+        <h2>Our Powerful Services</h2>
+        <p>Transform Your Life and Business with Our Expertise</p>
       </div>
-    </section>
-    <!-- End Team Section -->
+      <p class="fst-italic">
+        At InsightSerenity, we offer a range of services designed to empower you with the tools and knowledge needed for personal and professional success. Our consultancy is not just about providing solutions; it's about transforming potential into reality. With our comprehensive approach, we ensure that every client receives tailored, impactful guidance that drives meaningful results.
+      </p>
+      <p>
+        Whether you're looking to enhance your IT infrastructure, harness the power of data science, or seek life literacy coaching rooted in biblical principles, our team is dedicated to delivering excellence. Our services are designed to meet your unique needs, helping you navigate challenges, seize opportunities, and achieve your goals with confidence and clarity.
+      </p>
 
-    <!-- ======= Contact Section ======= -->
-    <section id="contact" class="contact">
-      <div class="container" data-aos="fade-up">
-
-        <div class="section-title">
-          <h2>Contact</h2>
-          <p>Contact Us</p>
-        </div>
-
-        <div>
-          <iframe style="border:0; width: 100%; height: 270px;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3463581.238368914!2d-95.8232680431166!3d29.760426845820692!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8640bf26dd4a7e4b%3A0x69d14a8ca0324b5d!2sHouston%2C%20TX!5e0!3m2!1sen!2sus!4v1649565404542!5m2!1sen!2sus" frameborder="0" allowfullscreen></iframe>
-        </div>
-
-        <div class="row mt-5">
-
-          <div class="col-lg-4">
-            <div class="info">
-              <div class="address">
-                <i class="bi bi-geo-alt"></i>
-                <h4>Location:</h4>
-                <p>A108 Adam Street, New York, NY 535022</p>
+      <% if (services.length > 0) { %>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+          <% services.forEach(service => { %>
+            <div class="col" data-aos="fade-up" data-aos-delay="<%= (services.indexOf(service) + 1) * 100 %>">
+              <div class="card h-100 shadow-sm">
+                <% if (service.imageUrl) { %>
+                  <img src="<%= service.imageUrl %>" class="card-img-top" alt="<%= service.name %>">
+                <% } else { %>
+                  <div class="card-img-top bg-secondary text-center py-5">
+                    <i class="bi bi-briefcase" style="font-size: 3rem;"></i>
+                  </div>
+                <% } %>
+                <div class="card-body">
+                  <h5 class="card-title"><a href="/service/<%= service._id %>"><%= service.name %></a></h5>
+                  <p class="card-text"><%= service.shortDescription || service.description.substring(0, 100) + '...' %></p>
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      Duration
+                      <span class="badge bg-primary rounded-pill"><%= service.duration %> min</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      Price
+                      <span class="badge bg-success rounded-pill">$ <%= service.formattedPrice %></span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      Category
+                      <span class="badge bg-info rounded-pill"><%= service.category %></span>
+                    </li>
+                  </ul>
+                </div>
+                <div class="card-footer">
+                  <small class="text-muted">
+                    <% if (service.availableOnline && service.availableInPerson) { %>
+                      Available Online & In Person
+                    <% } else if (service.availableOnline) { %>
+                      Available Online
+                    <% } else if (service.availableInPerson) { %>
+                      Available In Person
+                    <% } %>
+                  </small>
+                  <% if (service.rating && service.rating.count > 0) { %>
+                    <div class="mt-2">
+                      <% for (let i = 1; i <= 5; i++) { %>
+                        <i class="bi <%= i <= Math.round(service.rating.average) ? 'bi-star-fill' : 'bi-star' %> text-warning"></i>
+                      <% } %>
+                      <small class="text-muted ml-1">(<%= service.rating.count %> reviews)</small>
+                    </div>
+                  <% } %>
+                </div>
               </div>
-
-              <div class="email">
-                <i class="bi bi-envelope"></i>
-                <h4>Email:</h4>
-                <p><a href="mailto:Emmanuel.ao@outlook.com">Emmanuel.ao@outlook.com</a></p>
-              </div>
-
-              <div class="phone">
-                <i class="bi bi-phone"></i>
-                <h4>Call:</h4>
-                <p><a href="tel:+13463839529">+1 346 383 9529</a></p>
-              </div>
-
             </div>
-
-          </div>
-
-          <div class="col-lg-8 mt-5 mt-lg-0">
-
-            <form action="forms/contact.php" method="post" role="form" class="php-email-form">
-              <div class="row">
-                <div class="col-md-6 form-group">
-                  <input type="text" name="name" class="form-control" id="name" placeholder="Your Name" required>
-                </div>
-                <div class="col-md-6 form-group mt-3 mt-md-0">
-                  <input type="email" class="form-control" name="email" id="email" placeholder="Your Email" required>
-                </div>
-              </div>
-              <div class="form-group mt-3">
-                <input type="text" class="form-control" name="subject" id="subject" placeholder="Subject" required>
-              </div>
-              <div class="form-group mt-3">
-                <textarea class="form-control" name="message" rows="5" placeholder="Message" required></textarea>
-              </div>
-              <div class="my-3">
-                <div class="loading">Loading</div>
-                <div class="error-message"></div>
-                <div class="sent-message">Your message has been sent. Thank you!</div>
-              </div>
-              <div class="text-center"><button type="submit">Send Message</button></div>
-            </form>
-
-          </div>
-
+          <% }) %>
         </div>
+        <% if (services.length > 6) { %>
+          <div class="text-center mt-4">
+            <a href="/service" class="btn btn-primary">View More Services</a>
+          </div>
+        <% } %>
+      <% } else { %>
+        <div class="alert alert-info text-center" role="alert">
+          <h4 class="alert-heading">No services available at the moment</h4>
+          <p class="mb-0">We are working hard to add more services soon. Please check back later!</p>
+        </div>
+      <% } %>
+    </div>
+  </section>
 
+  <!-- Team Section -->
+  <section id="team" class="team">
+    <div class="container" data-aos="fade-up">
+      <div class="section-title">
+        <h2>Team</h2>
+        <p>Check our Team</p>
       </div>
-    </section>
-    <!-- End Contact Section -->
-</main><!-- End #main -->
+      <div class="row">
+        <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
+          <div class="member" data-aos="fade-up" data-aos-delay="100">
+            <div class="member-img">
+              <img src="lib/img/team/ceo.jpeg" class="img-fluid" alt="">
+              <div class="social">
+                <a href=""><i class="bi bi-twitter"></i></a>
+                <a href=""><i class="bi bi-facebook"></i></a>
+                <a href=""><i class="bi bi-instagram"></i></a>
+                <a href=""><i class="bi bi-linkedin"></i></a>
+              </div>
+            </div>
+            <div class="member-info">
+              <h4>Emmanuel Oyemosu</h4>
+              <span>Founder & CEO</span>
+            </div>
+          </div>
+        </div>
+        <!-- Add other team members here -->
+      </div>
+    </div>
+  </section>
 
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <!-- Call to Action Section -->
+  <section id="cta" class="cta py-5 bg-primary text-white">
+    <div class="container" data-aos="zoom-in">
+      <div class="text-center">
+        <h3>Ready to Transform Your Business?</h3>
+        <p>Join us on a journey of insight, serenity, and success. Let's unlock your potential together.</p>
+        <a class="btn btn-light btn-lg" href="/contact">Contact Us Today</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="contact">
+    <div class="container" data-aos="fade-up">
+      <div class="section-title">
+        <h2>Contact</h2>
+        <p>Contact Us</p>
+      </div>
+      <div>
+        <iframe style="border:0; width: 100%; height: 270px;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3463581.238368914!2d-95.8232680431166!3d29.760426845820692!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8640bf26dd4a7e4b%3A0x69d14a8ca0324b5d!2sHouston%2C%20TX!5e0!3m2!1sen!2sus!4v1649565404542!5m2!1sen!2sus" frameborder="0" allowfullscreen></iframe>
+      </div>
+      <div class="row mt-5">
+        <div class="col-lg-4">
+          <div class="info">
+            <div class="address">
+              <i class="bi bi-geo-alt"></i>
+              <h4>Location:</h4>
+              <p>A108 Adam Street, New York, NY 535022</p>
+            </div>
+            <div class="email">
+              <i class="bi bi-envelope"></i>
+              <h4>Email:</h4>
+              <p><a href="mailto:Emmanuel.ao@outlook.com">Emmanuel.ao@outlook.com</a></p>
+            </div>
+            <div class="phone">
+              <i class="bi bi-phone"></i>
+              <h4>Call:</h4>
+              <p><a href="tel:+13463839529">+1 346 383 9529</a></p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-8 mt-5 mt-lg-0">
+          <form action="forms/contact.php" method="post" role="form" class="php-email-form">
+            <div class="row">
+              <div class="col-md-6 form-group">
+                <input type="text" name="name" class="form-control" id="name" placeholder="Your Name" required>
+              </div>
+              <div class="col-md-6 form-group mt-3 mt-md-0">
+                <input type="email" class="form-control" name="email" id="email" placeholder="Your Email" required>
+              </div>
+            </div>
+            <div class="form-group mt-3">
+              <input type="text" class="form-control" name="subject" id="subject" placeholder="Subject" required>
+            </div>
+            <div class="form-group mt-3">
+              <textarea class="form-control" name="message" rows="5" placeholder="Message" required></textarea>
+            </div>
+            <div class="my-3">
+              <div class="loading">Loading</div>
+              <div class="error-message"></div>
+              <div class="sent-message">Your message has been sent. Thank you!</div>
+            </div>
+            <div class="text-center"><button type="submit">Send Message</button></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>

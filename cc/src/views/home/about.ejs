@@ -1,45 +1,95 @@
 <% layout('layouts/boilerplate') %>
 <!-- Header Start -->
 <div class="container-fluid bg-black py-5 mb-5 page-header">
-  <div class="container py-5">
-      <div class="row justify-content-center">
-          <div class="col-lg-10 text-center">
-              <h1 class="display-3 text-white animated slideInDown">About Us</h1>
-              <nav aria-label="breadcrumb">
-                  <ol class="breadcrumb justify-content-center">
-                      <li class="breadcrumb-item"><a class="text-white" href="/">Home</a></li>
-                      <li class="breadcrumb-item text-white active" aria-current="page">About</li>
-                  </ol>
-              </nav>
-          </div>
-      </div>
-  </div>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center">
+                <h1 class="display-3 text-white animated slideInDown">About Us</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-center">
+                        <li class="breadcrumb-item"><a class="text-white" href="/">Home</a></li>
+                        <li class="breadcrumb-item text-white active" aria-current="page">About</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
 </div>
 <!-- Header End -->
 
-<!-- ======= About Section ======= -->
-<section id="about" class="about">
+<!-- About Section -->
+<section id="about" class="about py-5">
     <div class="container" data-aos="fade-up">
-
-      <div class="row">
-        <div class="col-lg-6 order-1 order-lg-2" data-aos="fade-left" data-aos-delay="100">
-          <img src="lib/img/about.jpg" class="img-fluid" alt="About Us">
+        <div class="row align-items-center">
+            <div class="col-lg-6 order-2 order-lg-1" data-aos="fade-right" data-aos-delay="100">
+                <h2 class="font-weight-bold mb-4">Empowering You with Insightful Consultancy</h2>
+                <p class="lead fst-italic mb-4">
+                    At InsightSerenity, we are dedicated to providing top-tier consultancy services, leveraging our deep expertise in IT, data science, and life literacy coaching.
+                </p>
+                <p>
+                    Established by Emmanuel Oyemosu in 2023, our firm is built on the principles of excellence, integrity, and impactful guidance. With a mission to empower individuals and organizations alike, InsightSerenity blends cutting-edge technology with deep-seated values to offer solutions that are not only effective but also transformative.
+                </p>
+                <ul class="list-unstyled mt-4">
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-warning me-2"></i> Expert IT and data science consulting to drive your business forward.</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-warning me-2"></i> Life literacy coaching rooted in biblical principles for personal and professional growth.</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-warning me-2"></i> Commitment to delivering tailored solutions and unparalleled support to our clients.</li>
+                </ul>
+            </div>
+            <div class="col-lg-6 order-1 order-lg-2 mb-4 mb-lg-0" data-aos="fade-left" data-aos-delay="100">
+                <img src="/lib/img/about.jpg" class="img-fluid rounded shadow" alt="About InsightSerenity">
+            </div>
         </div>
-        <div class="col-lg-6 pt-4 pt-lg-0 order-2 order-lg-1 content" data-aos="fade-right" data-aos-delay="100">
-          <h3>Empowering You with Insightful Consultancy</h3>
-          <p class="fst-italic">
-            At InsightSerenity, we are dedicated to providing top-tier consultancy services, leveraging our deep expertise in IT, data science, and life literacy coaching. Established by Emmanuel Oyemosu in 2023, our firm is built on the principles of excellence, integrity, and impactful guidance.
-          </p>
-          <ul>
-            <li><i class="ri-check-double-line"></i> Expert IT and data science consulting to drive your business forward.</li>
-            <li><i class="ri-check-double-line"></i> Life literacy coaching rooted in biblical principles for personal and professional growth.</li>
-            <li><i class="ri-check-double-line"></i> Commitment to delivering tailored solutions and unparalleled support to our clients.</li>
-          </ul>
-          <p>
-            With a mission to empower individuals and organizations alike, InsightSerenity blends cutting-edge technology with deep-seated values to offer solutions that are not only effective but also transformative. Join us on a journey of insight, serenity, and success.
-          </p>
-        </div>
-      </div>
-
     </div>
-  </section><!-- End About Section -->
+</section>
+
+<!-- Mission, Vision, Values Section -->
+<section id="mvv" class="py-5 bg-light">
+    <div class="container" data-aos="fade-up">
+        <div class="row">
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="card h-100 shadow">
+                    <div class="card-body text-center">
+                        <i class="bi bi-bullseye text-warning" style="font-size: 3rem;"></i>
+                        <h3 class="card-title mt-3">Our Mission</h3>
+                        <p class="card-text">To empower individuals and organizations with innovative solutions and insightful guidance, fostering growth and success in an ever-evolving digital landscape.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="card h-100 shadow">
+                    <div class="card-body text-center">
+                        <i class="bi bi-eye text-warning" style="font-size: 3rem;"></i>
+                        <h3 class="card-title mt-3">Our Vision</h3>
+                        <p class="card-text">To be the leading force in transformative consultancy, bridging the gap between technology and human potential, and creating a world where insight leads to serenity and success.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="card h-100 shadow">
+                    <div class="card-body text-center">
+                        <i class="bi bi-heart text-warning" style="font-size: 3rem;"></i>
+                        <h3 class="card-title mt-3">Our Values</h3>
+                        <ul class="list-unstyled text-start">
+                            <li><i class="bi bi-check2 text-warning me-2"></i>Integrity</li>
+                            <li><i class="bi bi-check2 text-warning me-2"></i>Excellence</li>
+                            <li><i class="bi bi-check2 text-warning me-2"></i>Innovation</li>
+                            <li><i class="bi bi-check2 text-warning me-2"></i>Empowerment</li>
+                            <li><i class="bi bi-check2 text-warning me-2"></i>Continuous Learning</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section id="cta" class="cta py-5 bg-primary text-white">
+    <div class="container" data-aos="zoom-in">
+        <div class="text-center">
+            <h3>Ready to Transform Your Business?</h3>
+            <p>Join us on a journey of insight, serenity, and success. Let's unlock your potential together.</p>
+            <a class="btn btn-outline-light btn-lg" href="/contact">Contact Us Today</a>
+        </div>
+    </div>
+</section>

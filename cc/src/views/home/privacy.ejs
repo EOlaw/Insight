@@ -1,5 +1,26 @@
 <% layout('layouts/boilerplate') %>
 
+<style>
+    #toc {
+        position: sticky;
+        top: 100px;
+        height: calc(100vh - 120px);
+        overflow-y: auto;
+    }
+    #toc .nav-link {
+        color: #333;
+        transition: all 0.3s ease;
+    }
+    #toc .nav-link:hover, #toc .nav-link.active {
+        color: #ffc451;
+        background-color: #f8f9fa;
+    }
+    .accordion-button:not(.collapsed) {
+        background-color: #ffc451;
+        color: #000;
+    }
+</style>
+
 <!-- Header Start -->
 <div class="container-fluid bg-black py-5 mb-5 page-header">
     <div class="container py-5">
@@ -18,110 +39,128 @@
 </div>
 <!-- Header End -->
 
-<style>
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-        line-height: 1.6;
-        color: #333;
-    }
-    
-    .accordion-button {
-        font-weight: bold;
-        color: #0066cc;
-    }
-    
-    .btn-primary {
-        background-color: #0066cc;
-        border-color: #0066cc;
-    }
-    
-    .btn-primary:hover {
-        background-color: #004499;
-        border-color: #004499;
-    }
-</style>
+<!-- Privacy Policy Section -->
+<section id="privacy" class="privacy py-5">
+    <div class="container" data-aos="fade-up">
+        <div class="row">
+            <!-- Table of Contents -->
+            <div class="col-lg-3 mb-4">
+                <nav id="toc" class="navbar navbar-light bg-light flex-column align-items-stretch p-3">
+                    <nav class="nav nav-pills flex-column">
+                        <a class="nav-link" href="#introduction">1. Introduction</a>
+                        <a class="nav-link" href="#data-collection">2. Data Collection</a>
+                        <a class="nav-link" href="#data-use">3. Use of Data</a>
+                        <a class="nav-link" href="#data-sharing">4. Sharing of Data</a>
+                        <a class="nav-link" href="#data-security">5. Data Security</a>
+                        <a class="nav-link" href="#user-rights">6. Your Rights</a>
+                        <a class="nav-link" href="#policy-changes">7. Changes to This Policy</a>
+                        <a class="nav-link" href="#contact-us">8. Contact Us</a>
+                    </nav>
+                </nav>
+            </div>
 
-<!-- Header Start -->
-<div class="container mt-5">
-    <h1 class="text-center">Privacy</h1>
-    <h2 class="text-center display-4 mb-4">InsightSerenity Privacy Policy</h2>
-</div>
-<!-- Header End -->
+            <!-- Privacy Policy Content -->
+            <div class="col-lg-9">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h2 class="card-title mb-4">InsightSerenity Privacy Policy</h2>
+                        <p class="lead">Last updated: <%= new Date().toLocaleDateString() %></p>
 
-<div class="container">
-    <p class="text-center mb-4">Updated March 31, 2024</p>
-    <p class="text-center mb-5">InsightSerenity's Privacy Policy describes how we collect, use, and share your personal data.</p>
+                        <div class="accordion" id="privacyAccordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="introduction">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                        1. Introduction
+                                    </button>
+                                </h2>
+                                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="introduction" data-bs-parent="#privacyAccordion">
+                                    <div class="accordion-body">
+                                        <p>Welcome to InsightSerenity. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or use our services.</p>
+                                        <p>Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy, please do not access the site.</p>
+                                    </div>
+                                </div>
+                            </div>
 
-    <div class="mb-5">
-        <p>In addition to this Privacy Policy, we provide data and privacy information embedded in our products and certain features that ask to use your personal data. This product-specific information is accompanied by our Data & Privacy Icon.</p>
-        
-        <div class="text-center my-4">
-            <i class="fas fa-user-shield fa-3x fa-beat"></i>
-        </div>
-        
-        <p>You will be given an opportunity to review this product-specific information before using these features. You can view this information at any time, either in settings related to those features and/or online at insightserenity.com/legal/privacy/data.</p>
-        
-        <p>You can familiarize yourself with our privacy practices, accessible via the headings below, and contact us if you have any questions.</p>
-        
-        <div class="text-center mt-4">
-            <a href="#" class="btn btn-primary">Download a copy of this Privacy Policy (PDF)</a>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="data-collection">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                        2. Data Collection
+                                    </button>
+                                </h2>
+                                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="data-collection" data-bs-parent="#privacyAccordion">
+                                    <div class="accordion-body">
+                                        <p>We collect personal data that you provide directly to us when you use our services. This may include:</p>
+                                        <ul>
+                                            <li>Contact information (such as name, email address, mailing address, phone number)</li>
+                                            <li>Account credentials (such as usernames and passwords)</li>
+                                            <li>Payment information (such as credit card numbers and billing addresses)</li>
+                                            <li>Any other information you choose to provide</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Add more accordion items for each section -->
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="contact-us">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
+                                        8. Contact Us
+                                    </button>
+                                </h2>
+                                <div id="collapseEight" class="accordion-collapse collapse" aria-labelledby="contact-us" data-bs-parent="#privacyAccordion">
+                                    <div class="accordion-body">
+                                        <p>If you have questions or comments about this Privacy Policy, please contact us at:</p>
+                                        <address>
+                                            <strong>InsightSerenity, Inc.</strong><br>
+                                            1234 Innovation Drive<br>
+                                            Silicon Valley, CA 94043<br>
+                                            <abbr title="Phone">P:</abbr> (123) 456-7890<br>
+                                            <abbr title="Email">E:</abbr> <a href="mailto:legal@insightserenity.com">legal@insightserenity.com</a>
+                                        </address>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-5">
+                            <h3>Privacy Questions</h3>
+                            <p>If you have any additional questions or concerns about our Privacy Policy, please don't hesitate to contact us using the information provided above.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+</section>
+<!-- End Privacy Policy Section -->
 
-    <div class="accordion" id="privacyAccordion">
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingOne">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    What Is Personal Data at InsightSerenity?
-                </button>
-            </h2>
-            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#privacyAccordion">
-                <div class="accordion-body">
-                    <p>Personal data refers to information that identifies, relates to, describes, or is capable of being associated with, an individual. This includes, but is not limited to, names, addresses, email addresses, phone numbers, and any other information that could be used to identify you.</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingTwo">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                    Your Privacy Rights at InsightSerenity
-                </button>
-            </h2>
-            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#privacyAccordion">
-                <div class="accordion-body">
-                    <p>We are committed to protecting your privacy. You have the right to access, correct, or delete your personal data. Additionally, you can object to the processing of your personal data or request that such processing be restricted.</p>
-                </div>
-            </div>
-        </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var scrollSpy = new bootstrap.ScrollSpy(document.body, {
+            target: '#toc'
+        });
 
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingThree">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                    Personal Data InsightSerenity Collects from You
-                </button>
-            </h2>
-            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#privacyAccordion">
-                <div class="accordion-body">
-                    <p>We collect personal data that you provide directly to us when you use our services, such as when you create an account, book a consultation, or contact us for support.</p>
-                </div>
-            </div>
-        </div>
+        // Smooth scrolling for table of contents
+        document.querySelectorAll('#toc .nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                let target = document.querySelector(this.getAttribute('href'));
+                let headerOffset = 100;
+                let elementPosition = target.getBoundingClientRect().top;
+                let offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
-        <!-- Add more accordion items for each section of your privacy policy -->
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
 
-    </div>
-
-    <div class="mt-5">
-        <h2>Privacy Questions</h2>
-        <p>
-            If you have any questions about this Privacy Policy or our data protection practices, please contact us at:
-            <br>
-            <strong>InsightSerenity</strong><br>
-            [Your Address]<br>
-            [City, State, ZIP Code]<br>
-            Email: <a href="mailto:Emmanuel.ao@outlook.com">Emmanuel.ao@outlook.com</a><br>
-            Phone: <a href="tel:346-383-9529">346-383-9529</a>
-        </p>
-    </div>    
-</div>
+                // Open the corresponding accordion item
+                let accordionButton = target.querySelector('.accordion-button');
+                if (accordionButton && accordionButton.classList.contains('collapsed')) {
+                    accordionButton.click();
+                }
+            });
+        });
+    });
+</script>

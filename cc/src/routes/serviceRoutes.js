@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const serviceController = require('../consult/controllers/serviceController');
 const { isAuthenticated, authorizeAdminOrDeveloper} = require('../auth/utils/userUtils');
+
 // Apply isAuthenticated and authorizeAdminOrDeveloper middleware to all routes
 router.use(isAuthenticated, authorizeAdminOrDeveloper);
 

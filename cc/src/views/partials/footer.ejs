@@ -1,70 +1,93 @@
 <!-- ======= Footer ======= -->
-<footer id="footer">
-  <div class="footer-top">
-      <div class="container">
-          <div class="row">
+<footer id="footer" class="bg-black text-light py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
+                <h5 class="text-uppercase mb-4">InsightSerenity</h5>
+                <p class="mb-3">
+                    Empowering businesses with innovative IT and data science solutions.
+                </p>
+                <p class="mb-1"><i class="bi bi-geo-alt-fill me-2"></i>Houston, TX 77036</p>
+                <p class="mb-1"><i class="bi bi-telephone-fill me-2"></i><a href="tel:3463839529" class="text-light">346-383-9529</a></p>
+                <p class="mb-3"><i class="bi bi-envelope-fill me-2"></i><a href="mailto:emmanuel.ao@outlook.com" class="text-light">emmanuel.ao@outlook.com</a></p>
+                <div class="social-links">
+                    <a href="#" class="me-2 text-light"><i class="bi bi-twitter"></i></a>
+                    <a href="#" class="me-2 text-light"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="me-2 text-light"><i class="bi bi-linkedin"></i></a>
+                    <a href="#" class="me-2 text-light"><i class="bi bi-instagram"></i></a>
+                </div>
+            </div>
 
-              <div class="col-lg-3 col-md-6">
-                  <div class="footer-info">
-                      <h3>InsightSerenity</h3>
-                      <p>
-                          Houston, TX <br>
-                          77036<br><br>
-                          <strong>Phone:</strong> <a href="tel:3463839529">346-383-9529</a><br>
-                          <strong>Email:</strong> <a href="mailto:emmanuel.ao@outlook.com">Emmanuel.ao@outlook.com</a><br>
-                      </p>
-                      <div class="social-links mt-3">
-                          <a href="#" class="twitter"><i class="bx bxl-twitter"></i></a>
-                          <a href="#" class="facebook"><i class="bx bxl-facebook"></i></a>
-                          <a href="#" class="instagram"><i class="bx bxl-instagram"></i></a>
-                          <a href="#" class="google-plus"><i class="bx bxl-skype"></i></a>
-                          <a href="#" class="linkedin"><i class="bx bxl-linkedin"></i></a>
-                      </div>
-                  </div>
-              </div>
+            <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
+                <h5 class="text-uppercase mb-4">Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="/" class="text-light">Home</a></li>
+                    <li class="mb-2"><a href="/about" class="text-light">About Us</a></li>
+                    <li class="mb-2"><a href="/service/" class="text-light">Services</a></li>
+                    <li class="mb-2"><a href="/terms" class="text-light">Terms of Service</a></li>
+                    <li class="mb-2"><a href="/privacy" class="text-light">Privacy Policy</a></li>
+                </ul>
+            </div>
 
-              <div class="col-lg-2 col-md-6 footer-links">
-                  <h4>Useful Links</h4>
-                  <ul>
-                      <li><i class="bx bx-chevron-right"></i> <a href="/">Home</a></li>
-                      <li><i class="bx bx-chevron-right"></i> <a href="/about">About us</a></li>
-                      <li><i class="bx bx-chevron-right"></i> <a href="/service/">Services</a></li>
-                      <li><i class="bx bx-chevron-right"></i> <a href="/terms">Terms of service</a></li>
-                      <li><i class="bx bx-chevron-right"></i> <a href="/privacy">Privacy policy</a></li>
-                  </ul>
-              </div>
-
-              <div class="col-lg-3 col-md-6 footer-links">
-                <h4>Our Services</h4>
-                <ul>
+            <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                <h5 class="text-uppercase mb-4">Our Services</h5>
+                <ul class="list-unstyled">
                     <% if (services && services.length > 0) { %>
-                        <% services.forEach(service => { %>
-                            <li><i class="bx bx-chevron-right"></i> <a href="/service/<%= service._id %>"><%= service.name %></a></li>
+                        <% services.slice(0, 5).forEach(service => { %>
+                            <li class="mb-2"><a href="/service/<%= service._id %>" class="text-light"><%= service.name %></a></li>
                         <% }) %>
+                        <% if (services.length > 5) { %>
+                            <li class="mb-2"><a href="/service" class="text-light">View All Services</a></li>
+                        <% } %>
                     <% } else { %>
-                        <li><i class="bx bx-chevron-right"></i> <a href="#">No services available</a></li>
+                        <li class="mb-2">No services available</li>
                     <% } %>
                 </ul>
-              </div>
+            </div>
 
-              <div class="col-lg-4 col-md-6 footer-newsletter">
-                  <h4>Our Newsletter</h4>
-                  <p>Stay updated with the latest insights and news from InsightSerenity. Subscribe to our newsletter.</p>
-                  <form action="" method="post">
-                      <input type="email" name="email"><input type="submit" value="Subscribe">
-                  </form>
-              </div>
+            <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                <h5 class="text-uppercase mb-4">Newsletter</h5>
+                <p class="mb-3">Stay updated with our latest insights and news. Subscribe to our newsletter.</p>
+                <form action="" method="post" class="mb-3">
+                    <div class="input-group">
+                        <input type="email" class="form-control" placeholder="Enter your email" aria-label="Enter your email" aria-describedby="button-addon2">
+                        <button class="btn btn-outline-light" type="submit" id="button-addon2">Subscribe</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="text-center py-3 mt-4 bg-dark">
+        <p class="mb-0">&copy; <%= new Date().getFullYear() %> InsightSerenity. All rights reserved.</p>
+    </div>
+    <!-- End Footer -->
+</footer>
 
-          </div>
-      </div>
-  </div>
 
-  <div class="container">
-      <div class="copyright">
-          &copy; Copyright <strong><span>InsightSerenity</span></strong>. All Rights Reserved
-      </div>
-      <div class="credits">
-          Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
-      </div>
-  </div>
-</footer><!-- End Footer -->
+<style>
+    #footer .social-links a {
+        font-size: 1.2rem;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    #footer .social-links a:hover {
+        color: #ffc451 !important;
+        transform: translateY(-3px);
+    }
+    #footer ul li a {
+        transition: all 0.3s ease;
+    }
+    #footer ul li a:hover {
+        color: #ffc451 !important;
+        padding-left: 5px;
+    }
+    #footer .form-control:focus {
+        box-shadow: none;
+        border-color: #ffc451;
+    }
+    #footer .btn-outline-light:hover {
+        background-color: #ffc451;
+        border-color: #ffc451;
+        color: #000;
+    }
+</style>

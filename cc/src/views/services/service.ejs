@@ -35,24 +35,62 @@
         </p>
 
         <% if (services.length > 0) { %>
-            <div class="row">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                 <% services.forEach(service => { %>
                     <div class="col-lg-4 col-md-6 d-flex align-items-stretch mt-4" data-aos="zoom-in" data-aos-delay="<%= (services.indexOf(service) + 1) * 100 %>">
-                        <div class="icon-box">
-                            <div class="icon"><i class="bx bx-briefcase"></i></div>
-                            <h4><a href="/service/<%= service._id %>"><%= service.name %></a></h4>
-                            <p><%= service.description || 'No description available' %></p>
-                            <p><strong>Duration:</strong> <%= service.duration %> minutes</p>
-                            <p><strong>Price:</strong> $<%= service.price.toFixed(2) %></p>
-                            <p><strong>Category:</strong> <%= service.category %></p>
+                        <div class="card h-100 shadow-sm">
+                            <% if (service.imageUrl) { %>
+                                <img src="<%= service.imageUrl %>" class="card-img-top" alt="<%= service.name %>">
+                            <% } else { %>
+                                <div class="card-img-top bg-light text-center py-5">
+                                    <i class="bi bi-briefcase" style="font-size: 3rem;"></i>
+                                </div>
+                            <% } %>
+                            <div class="card-body">
+                                <h5 class="card-title"><a href="/service/<%= service._id %>"><%= service.name %></a></h5>
+                                <p class="card-text"><%= service.shortDescription || (service.description && service.description.substring(0, 100) + '...') || 'No description available' %></p>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Duration
+                                        <span class="badge bg-primary rounded-pill"><%= service.duration %> min</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Price
+                                        <span class="badge bg-success rounded-pill">$ <%= service.formattedPrice %></span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Category
+                                        <span class="badge bg-info rounded-pill"><%= service.category %></span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card-footer">
+                                <small class="text-muted">
+                                    Available: 
+                                    <%= service.availableOnline ? 'Online' : '' %>
+                                    <%= service.availableOnline && service.availableInPerson ? ' & ' : '' %>
+                                    <%= service.availableInPerson ? 'In Person' : '' %>
+                                </small>
+                                <% if (service.rating && service.rating.count > 0) { %>
+                                    <div class="mt-2">
+                                        <% for (let i = 1; i <= 5; i++) { %>
+                                            <i class="bi <%= i <= Math.round(service.rating.average) ? 'bi-star-fill' : 'bi-star' %> text-warning"></i>
+                                        <% } %>
+                                        <small class="text-muted ml-1">(<%= service.rating.count %> reviews)</small>
+                                    </div>
+                                <% } %>
+                                <div class="mt-3">
+                                    <a href="/service/<%= service._id %>" class="btn btn-primary btn-sm">Learn More</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 <% }) %>
             </div>
         <% } else { %>
-            <div class="alert alert-info text-center">
-                <h4>No services available at the moment</h4>
-                <p>We are working hard to add more services soon. Please check back later!</p>
+            <div class="alert alert-info text-center" role="alert">
+                <h4 class="alert-heading">No services available at the moment</h4>
+                <p class="mb-0">We are working hard to add more services soon. Please check back later!</p>
             </div>
         <% } %>
 

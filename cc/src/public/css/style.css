@@ -127,7 +127,8 @@ h6 {
 
 #header.header-scrolled,
 #header.header-inner-pages {
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.9);
+  padding: 10px 0;
 }
 
 #header .logo {
@@ -701,6 +702,46 @@ section {
   box-shadow: 0px 0 25px 0 rgba(0, 0, 0, 0.1);
   transform: translateY(-10px);
 }
+
+/* New styles for the card-based layout */
+.services .card {
+  border: 1px solid #ebebeb;
+  transition: all ease-in-out 0.3s;
+}
+
+.services .card:hover {
+  border-color: #fff;
+  box-shadow: 0px 0 25px 0 rgba(0, 0, 0, 0.1);
+  transform: translateY(-10px);
+}
+
+.services .card-body h5.card-title a {
+  color: #151515;  /* Black color for the service name */
+  transition: ease-in-out 0.3s;
+}
+
+.services .card-body h5.card-title a:hover {
+  color: #ffc451;  /* Yellow color on hover */
+  text-decoration: none;
+}
+
+.services .card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+
+.services .card-body .list-group-item {
+  border: none;
+  padding: 0.5rem 0;
+}
+/*
+
+.services .card-footer {
+  background-color: transparent;
+  border-top: none;
+}
+
+*/
 
 /*--------------------------------------------------------------
 # Cta

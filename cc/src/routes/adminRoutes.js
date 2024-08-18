@@ -1,8 +1,34 @@
 const express = require('express');
 const router = express.Router();
 const adminControllers = require('../admin/adminController');
-const { authorizeAdmin } = require('../auth/utils/userUtils'); // Assume you have this middleware
+const { isAuthenticated, authorizeAdmin } = require('../auth/utils/userUtils');
 
-router.post('/verify-consultant', authorizeAdmin, adminControllers.verifyConsultant);
+// Apply authentication and admin authorization to all routes
+router.use(isAuthenticated, authorizeAdmin);
+
+// Dashboard
+router.get('/dashboard', adminControllers.viewSystemStats);
+
+// Users
+router.get('/users', adminControllers.renderUsers);
+router.post('/users', adminControllers.manageUsers);
+
+// Services
+router.get('/services', adminControllers.renderServices);
+router.post('/services', adminControllers.manageServices);
+
+// Consultations
+router.get('/consultations', adminControllers.renderConsultations);
+router.post('/consultations', adminControllers.manageConsultations);
+
+// Reports
+router.get('/reports', adminControllers.renderReports);
+router.post('/reports', adminControllers.generateReports);
+
+// Main admin panel route
+router.get('/', adminControllers.renderAdminPanel);
+
+// Partial content route
+router.get('/content/:section', adminControllers.getAdminContent);
 
 module.exports = router;

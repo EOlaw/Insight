@@ -2,78 +2,75 @@ const Consultation = require('../models/consultationModel');
 const Client = require('../models/clientModel');
 const Consultant = require('../models/consultantModel');
 const Service = require('../models/serviceModel');
+const User = require('../../auth/models/userModel');
 const mongoose = require('mongoose');
+const emailService = require('../../utils/emailService'); // Assuming you have an email service
 
 const consultationController = {
     // Create a new consultation
-    manageConsultation: async (req, res) => {
+    createConsultation: async (req, res) => {
         try {
-            const { clientId, consultantId, serviceId, dateTime, duration, status } = req.body;
-            
-            // Validate input
-            if (!clientId || !consultantId || !serviceId || !dateTime || !duration) {
-                return res.status(400).json({ message: 'Missing required fields' });
-            }
+            const { consultantId, serviceId, dateTime, duration } = req.body;
+            const clientId = req.user._id;
 
-            // Check if client and consultant exist
-            const [client, consultant] = await Promise.all([
-                User.findById(clientId),
-                User.findById(consultantId)
+            const [consultant, service, client] = await Promise.all([
+                Consultant.findById(consultantId).populate('user', 'email'),
+                Service.findById(serviceId),
+                Client.findOne({ user: clientId }).populate('user', 'email')
             ]);
 
-            if (!client || client.role !== 'client') {
-                return res.status(404).json({ message: 'Client not found' });
+            if (!consultant || !service || !client) {
+                return res.status(404).json({ message: 'Consultant, service, or client not found' });
             }
 
-            if (!consultant || consultant.role !== 'consultant') {
-                return res.status(404).json({ message: 'Consultant not found' });
-            }
+            const price = service.basePrice * (duration / 60); // Assuming basePrice is per hour
 
-            // Create or update consultation
-            let consultation;
-            if (req.params.id) {
-                // If ID is provided, update existing consultation
-                consultation = await Consultation.findByIdAndUpdate(
-                    req.params.id,
-                    { client: clientId, consultant: consultantId, service: serviceId, dateTime, duration, status },
-                    { new: true, runValidators: true }
+            const newConsultation = new Consultation({
+                client: clientId,
+                consultant: consultantId,
+                service: serviceId,
+                dateTime,
+                duration,
+                price,
+                statusHistory: [{ status: 'scheduled', changedAt: new Date(), changedBy: clientId }]
+            });
+
+            await newConsultation.save();
+
+            console.log("Client email:", client.user.email); // Debug log
+
+            // Send confirmation emails
+            try {
+                await emailService.sendConsultationConfirmation(client.user, newConsultation);
+            } catch (emailError) {
+                console.error('Error sending client email:', emailError);
+            }
+            try {
+                await emailService.sendEmail(
+                    consultant.email,
+                    'New Consultation Scheduled',
+                    'newConsultationNotification',
+                    { consultationDetails: newConsultation }
                 );
-                if (!consultation) {
-                    return res.status(404).json({ message: 'Consultation not found' });
-                }
-            } else {
-                // If no ID, create new consultation
-                consultation = new Consultation({
-                    client: clientId,
-                    consultant: consultantId,
-                    service: serviceId,
-                    dateTime: new Date(dateTime),
-                    duration,
-                    status: status || 'scheduled'
-                });
-                await consultation.save();
+            } catch (emailError) {
+                console.error('Error sending consultant email:', emailError);
             }
 
-            res.status(201).json({ message: 'Consultation managed successfully', consultation });
+            res.status(201).json({ message: 'Consultation created successfully', consultation: newConsultation });
         } catch (err) {
-            res.status(500).json({ message: 'Error managing consultation', error: err.message });
+            res.status(500).json({ message: 'Error creating consultation', error: err.message });
         }
     },
 
-    // Get all consultations with filtering and pagination
+    // Get all consultations (Admin only)
     getAllConsultations: async (req, res) => {
         try {
-            const { page = 1, limit = 10, status, startDate, endDate, clientId, consultantId } = req.query;
+            const { page = 1, limit = 10, status, startDate, endDate } = req.query;
             const query = {};
 
             if (status) query.status = status;
-            if (clientId) query.client = clientId;
-            if (consultantId) query.consultant = consultantId;
             if (startDate && endDate) {
-                query.dateTime = {
-                    $gte: new Date(startDate),
-                    $lte: new Date(endDate)
-                };
+                query.dateTime = { $gte: new Date(startDate), $lte: new Date(endDate) };
             }
 
             const consultations = await Consultation.find(query)
@@ -82,18 +79,47 @@ const consultationController = {
                 .populate('service', 'name')
                 .limit(limit * 1)
                 .skip((page - 1) * limit)
-                .sort({ dateTime: -1 })
-                .exec();
+                .sort({ dateTime: -1 });
 
             const count = await Consultation.countDocuments(query);
 
             res.status(200).json({
                 consultations,
                 totalPages: Math.ceil(count / limit),
-                currentPage: page
+                currentPage: Number(page)
             });
         } catch (err) {
             res.status(500).json({ message: 'Error fetching consultations', error: err.message });
+        }
+    },
+
+    // Get consultations for a specific client
+    getClientConsultations: async (req, res) => {
+        try {
+            const clientId = req.user._id;
+            const consultations = await Consultation.find({ client: clientId })
+                .populate('consultant', 'firstName lastName')
+                .populate('service', 'name')
+                .sort({ dateTime: -1 });
+
+            res.status(200).json(consultations);
+        } catch (err) {
+            res.status(500).json({ message: 'Error fetching client consultations', error: err.message });
+        }
+    },
+
+    // Get consultations for a specific consultant
+    getConsultantConsultations: async (req, res) => {
+        try {
+            const consultantId = req.user._id;
+            const consultations = await Consultation.find({ consultant: consultantId })
+                .populate('client', 'firstName lastName')
+                .populate('service', 'name')
+                .sort({ dateTime: -1 });
+
+            res.status(200).json(consultations);
+        } catch (err) {
+            res.status(500).json({ message: 'Error fetching consultant consultations', error: err.message });
         }
     },
 
@@ -109,6 +135,14 @@ const consultationController = {
                 return res.status(404).json({ message: 'Consultation not found' });
             }
 
+            // Check if the user is authorized to view this consultation
+            if (req.user.role === 'client' && consultation.client._id.toString() !== req.user._id.toString()) {
+                return res.status(403).json({ message: 'Not authorized to view this consultation' });
+            }
+            if (req.user.role === 'consultant' && consultation.consultant._id.toString() !== req.user._id.toString()) {
+                return res.status(403).json({ message: 'Not authorized to view this consultation' });
+            }
+
             res.status(200).json(consultation);
         } catch (err) {
             res.status(500).json({ message: 'Error fetching consultation', error: err.message });
@@ -118,74 +152,134 @@ const consultationController = {
     // Update a consultation
     updateConsultation: async (req, res) => {
         try {
-            const { status, notes, followUpActions, recordingUrl, feedback, paymentStatus } = req.body;
-            const updatedConsultation = await Consultation.findByIdAndUpdate(
-                req.params.id,
-                { 
-                    status, 
-                    notes, 
-                    followUpActions, 
-                    recordingUrl, 
-                    feedback, 
-                    paymentStatus,
-                    $push: { 
-                        statusHistory: { 
-                            status: status, 
-                            changedAt: new Date(), 
-                            changedBy: req.user._id 
-                        } 
-                    }
-                },
-                { new: true, runValidators: true }
-            );
+            const { status, notes, followUpActions, recordingUrl } = req.body;
+            const consultation = await Consultation.findById(req.params.id)
+                .populate('client', 'email')
+                .populate('consultant', 'email');
 
-            if (!updatedConsultation) {
+            if (!consultation) {
                 return res.status(404).json({ message: 'Consultation not found' });
             }
 
-            res.status(200).json({ message: 'Consultation updated successfully', consultation: updatedConsultation });
+            // Check authorization
+            if (req.user.role === 'consultant' && consultation.consultant.toString() !== req.user._id.toString()) {
+                return res.status(403).json({ message: 'Not authorized to update this consultation' });
+            }
+
+            if (status) {
+                consultation.status = status;
+                consultation.statusHistory.push({
+                    status,
+                    changedAt: new Date(),
+                    changedBy: req.user._id
+                });
+
+                // Send status update email
+                await emailService.sendEmail(
+                    consultation.client.email,
+                    'Consultation Status Update',
+                    'consultationStatusUpdate',
+                    { consultationDetails: consultation, newStatus: status }
+                );
+            }
+            if (notes) consultation.notes = notes;
+            if (followUpActions) consultation.followUpActions = followUpActions;
+            if (recordingUrl) consultation.recordingUrl = recordingUrl;
+
+            await consultation.save();
+
+            res.status(200).json({ message: 'Consultation updated successfully', consultation });
         } catch (err) {
             res.status(500).json({ message: 'Error updating consultation', error: err.message });
         }
     },
 
-    // Delete a consultation
-    deleteConsultation: async (req, res) => {
+    // Cancel a consultation
+    cancelConsultation: async (req, res) => {
         try {
-            const deletedConsultation = await Consultation.findByIdAndDelete(req.params.id);
+            const consultation = await Consultation.findById(req.params.id)
+                .populate('client', 'email')
+                .populate('consultant', 'email');
 
-            if (!deletedConsultation) {
+            if (!consultation) {
                 return res.status(404).json({ message: 'Consultation not found' });
             }
 
-            res.status(200).json({ message: 'Consultation deleted successfully' });
+            // Check if the user is authorized to cancel
+            if (req.user.role === 'client' && consultation.client.toString() !== req.user._id.toString()) {
+                return res.status(403).json({ message: 'Not authorized to cancel this consultation' });
+            }
+
+            consultation.status = 'cancelled';
+            consultation.statusHistory.push({
+                status: 'cancelled',
+                changedAt: new Date(),
+                changedBy: req.user._id
+            });
+
+            await consultation.save();
+
+            // Send cancellation emails
+            await emailService.sendEmail(
+                consultation.client.email,
+                'Consultation Cancelled',
+                'consultationCancelled',
+                { consultationDetails: consultation }
+            );
+            await emailService.sendEmail(
+                consultation.consultant.email,
+                'Consultation Cancelled',
+                'consultationCancelled',
+                { consultationDetails: consultation }
+            );
+
+            res.status(200).json({ message: 'Consultation cancelled successfully', consultation });
         } catch (err) {
-            res.status(500).json({ message: 'Error deleting consultation', error: err.message });
+            res.status(500).json({ message: 'Error cancelling consultation', error: err.message });
         }
     },
+
 
     // Reschedule a consultation
     rescheduleConsultation: async (req, res) => {
         try {
             const { newDateTime } = req.body;
-            if (!newDateTime) {
-                return res.status(400).json({ message: 'New date and time are required' });
-            }
+            const consultation = await Consultation.findById(req.params.id)
+                .populate('client', 'email')
+                .populate('consultant', 'email');
 
-            const consultation = await Consultation.findById(req.params.id);
             if (!consultation) {
                 return res.status(404).json({ message: 'Consultation not found' });
             }
 
+            // Check authorization
+            if (req.user.role === 'client' && consultation.client.toString() !== req.user._id.toString()) {
+                return res.status(403).json({ message: 'Not authorized to reschedule this consultation' });
+            }
+
             consultation.dateTime = new Date(newDateTime);
             consultation.status = 'rescheduled';
-            consultation.statusHistory.push({ 
-                status: 'rescheduled', 
-                changedAt: new Date(), 
-                changedBy: req.user._id 
+            consultation.statusHistory.push({
+                status: 'rescheduled',
+                changedAt: new Date(),
+                changedBy: req.user._id
             });
 
             await consultation.save();
+
+            // Send rescheduling emails
+            await emailService.sendEmail(
+                consultation.client.email,
+                'Consultation Rescheduled',
+                'consultationRescheduled',
+                { consultationDetails: consultation }
+            );
+            await emailService.sendEmail(
+                consultation.consultant.email,
+                'Consultation Rescheduled',
+                'consultationRescheduled',
+                { consultationDetails: consultation }
+            );
 
             res.status(200).json({ message: 'Consultation rescheduled successfully', consultation });
         } catch (err) {
@@ -197,13 +291,15 @@ const consultationController = {
     addFeedback: async (req, res) => {
         try {
             const { rating, comment } = req.body;
-            if (!rating) {
-                return res.status(400).json({ message: 'Rating is required' });
-            }
-
             const consultation = await Consultation.findById(req.params.id);
+
             if (!consultation) {
                 return res.status(404).json({ message: 'Consultation not found' });
+            }
+
+            // Check if the user is the client of this consultation
+            if (consultation.client.toString() !== req.user._id.toString()) {
+                return res.status(403).json({ message: 'Not authorized to add feedback to this consultation' });
             }
 
             consultation.feedback = { rating, comment };
@@ -215,7 +311,46 @@ const consultationController = {
         }
     },
 
-    // Get consultations statistics
+    // Mark consultation as completed
+    markAsCompleted: async (req, res) => {
+        try {
+            const consultation = await Consultation.findById(req.params.id)
+                .populate('client', 'email')
+                .populate('consultant', 'email');
+
+            if (!consultation) {
+                return res.status(404).json({ message: 'Consultation not found' });
+            }
+
+            // Check if the user is the consultant of this consultation
+            if (consultation.consultant.toString() !== req.user._id.toString()) {
+                return res.status(403).json({ message: 'Not authorized to mark this consultation as completed' });
+            }
+
+            consultation.status = 'completed';
+            consultation.statusHistory.push({
+                status: 'completed',
+                changedAt: new Date(),
+                changedBy: req.user._id
+            });
+
+            await consultation.save();
+
+            // Send completion email to client
+            await emailService.sendEmail(
+                consultation.client.email,
+                'Consultation Completed',
+                'consultationCompleted',
+                { consultationDetails: consultation }
+            );
+
+            res.status(200).json({ message: 'Consultation marked as completed', consultation });
+        } catch (err) {
+            res.status(500).json({ message: 'Error marking consultation as completed', error: err.message });
+        }
+    },
+
+    // Get consultation statistics (Admin only)
     getConsultationStats: async (req, res) => {
         try {
             const stats = await Consultation.aggregate([
@@ -241,48 +376,8 @@ const consultationController = {
         }
     },
 
-    // Get upcoming consultations
-    getUpcomingConsultations: async (req, res) => {
-        try {
-            const upcomingConsultations = await Consultation.find({
-                dateTime: { $gt: new Date() },
-                status: { $nin: ['cancelled', 'completed'] }
-            })
-            .populate('client', 'firstName lastName email')
-            .populate('consultant', 'firstName lastName email')
-            .populate('service', 'name')
-            .sort({ dateTime: 1 });
-
-            res.status(200).json(upcomingConsultations);
-        } catch (err) {
-            res.status(500).json({ message: 'Error fetching upcoming consultations', error: err.message });
-        }
-    },
-
-    // Mark consultation as no-show
-    markAsNoShow: async (req, res) => {
-        try {
-            const consultation = await Consultation.findById(req.params.id);
-            if (!consultation) {
-                return res.status(404).json({ message: 'Consultation not found' });
-            }
-
-            consultation.status = 'no-show';
-            consultation.statusHistory.push({ 
-                status: 'no-show', 
-                changedAt: new Date(), 
-                changedBy: req.user._id 
-            });
-            await consultation.save();
-
-            res.status(200).json({ message: 'Consultation marked as no-show', consultation });
-        } catch (err) {
-            res.status(500).json({ message: 'Error marking consultation as no-show', error: err.message });
-        }
-    },
-
-    // Generate report for consultations
-    generateReport: async (req, res) => {
+    // Generate consultation report (Admin only)
+    generateConsultationReport: async (req, res) => {
         try {
             const { startDate, endDate } = req.query;
             if (!startDate || !endDate) {
@@ -309,7 +404,7 @@ const consultationController = {
 
             res.status(200).json({ report });
         } catch (err) {
-            res.status(500).json({ message: 'Error generating report', error: err.message });
+            res.status(500).json({ message: 'Error generating consultation report', error: err.message });
         }
     }
 };
