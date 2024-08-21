@@ -1,0 +1,205 @@
+<% layout('layouts/boilerplate') %>
+<title>Pay for Your Consultation</title>
+
+<style>
+    #card-element {
+        border: 1px solid #ced4da;
+        padding: 10px;
+        height: 40px;
+    }
+    #loading {
+        display: none;
+        text-align: center;
+        padding: 10px;
+        font-weight: bold;
+    }
+    #payment-success {
+        display: none;
+        color: green;
+        font-weight: bold;
+    }
+</style>
+
+<!-- Header Start -->
+<div class="container-fluid bg-black py-5 mb-5 page-header">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center">
+                <h1 class="display-3 text-white animated slideInDown">Pay for Your Consultation</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-center">
+                        <li class="breadcrumb-item"><a class="text-white" href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a class="text-white" href="/client/">Client Profile</a></li>
+                        <li class="breadcrumb-item text-white active" aria-current="page">Payment</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Header End -->
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Pay for Your Consultation</h2>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <p><strong>Consultant:</strong> <%= consultation.consultant.firstName %> <%= consultation.consultant.lastName %></p>
+                        <p><strong>Service:</strong> <%= consultation.service.name %></p>
+                        <p><strong>Date and Time:</strong> <%= new Date(consultation.dateTime).toLocaleString() %></p>
+                        <p><strong>Duration:</strong> <%= consultation.duration %> minutes</p>
+                        <p><strong>Price:</strong> <%= consultation.price %> <%= consultation.service.currency %></p>
+                    </div>
+
+                    <form id="payment-form">
+                        <div id="card-element" class="mb-3">
+                            <!-- Stripe Elements will insert secure card input fields here -->
+                        </div>
+                        <div id="card-errors" role="alert" class="text-danger mb-3"></div>
+                        <div id="loading" class="mb-3">Processing payment...</div>
+                        <div id="payment-success" class="mb-3">Payment successful! Redirecting...</div>
+                        <button id="submit-button" class="btn btn-primary btn-lg btn-block">Pay Now</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    console.log('Script started');
+    const stripe = Stripe('<%= stripePublicKey %>');
+    console.log('Stripe initialized:', !!stripe);
+    
+    const elements = stripe.elements();
+    console.log('Elements created:', !!elements);
+
+    const style = {
+        base: {
+            color: '#32325d',
+            fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+            fontSmoothing: 'antialiased',
+            fontSize: '16px',
+            '::placeholder': {
+                color: '#aab7c4'
+            }
+        },
+        invalid: {
+            color: '#fa755a',
+            iconColor: '#fa755a'
+        }
+    };
+    
+    const cardElement = elements.create('card', {style: style});
+    console.log('Card element created:', !!cardElement);
+
+    const cardElementMount = document.getElementById('card-element');
+    console.log('Card element mount found:', !!cardElementMount);
+
+    cardElement.mount('#card-element');
+    console.log('Card element mounted');
+
+    cardElement.on('ready', function() {
+        console.log('Card Element is ready');
+    });
+
+    cardElement.on('change', function(event) {
+        console.log('Card Element change event:', event);
+        if (event.error) {
+            displayError(event.error.message);
+        } else {
+            displayError('');
+        }
+    });
+
+    const form = document.getElementById('payment-form');
+    const submitButton = document.getElementById('submit-button');
+    const loadingElement = document.getElementById('loading');
+    const errorElement = document.getElementById('card-errors');
+    const successElement = document.getElementById('payment-success');
+
+    function displayError(message) {
+        errorElement.textContent = message;
+        console.error('Payment error:', message);
+    }
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        submitButton.disabled = true;
+        loadingElement.style.display = 'block';
+        errorElement.textContent = '';
+        successElement.style.display = 'none';
+
+        try {
+            console.log('Submitting payment form');
+            const response = await fetch('/consultation/<%= consultation._id %>/process-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({})
+            });
+
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
+
+            const responseText = await response.text();
+            console.log('Response body:', responseText);
+
+            if (!response.ok) {
+                let errorMessage = `HTTP error! status: ${response.status}`;
+                try {
+                    const errorJson = JSON.parse(responseText);
+                    errorMessage += `, error: ${errorJson.error || 'Unknown error'}`;
+                } catch (e) {
+                    errorMessage += `, body: ${responseText}`;
+                }
+                throw new Error(errorMessage);
+            }
+
+            const result = JSON.parse(responseText);
+            console.log('Parsed result:', result);
+
+            if (!result.clientSecret) {
+                throw new Error('No client secret received from the server');
+            }
+
+            const { error, paymentIntent } = await stripe.confirmCardPayment(result.clientSecret, {
+                payment_method: {
+                    card: cardElement,
+                }
+            });
+
+            if (error) {
+                throw error;
+            } else if (paymentIntent.status === 'succeeded') {
+                // Call the confirmPayment endpoint
+                const confirmResponse = await fetch('/consultation/<%= consultation._id %>/confirm-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ paymentIntentId: paymentIntent.id })
+                });
+
+                if (!confirmResponse.ok) {
+                    throw new Error('Failed to confirm payment on the server');
+                }
+
+                successElement.style.display = 'block';
+                setTimeout(() => {
+                    window.location.href = '/consultation/<%= consultation._id %>/confirmation';
+                }, 2000);
+            } else {
+                throw new Error('Payment failed');
+            }
+        } catch (error) {
+            console.error('Payment error:', error);
+            displayError(error.message);
+        } finally {
+            submitButton.disabled = false;
+            loadingElement.style.display = 'none';
+        }
+    });
+</script>

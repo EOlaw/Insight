@@ -1,65 +1,176 @@
 <% layout('layouts/boilerplate') %>
+<title>Create Consultation</title>
+
 <!-- Header Start -->
 <div class="container-fluid bg-black py-5 mb-5 page-header">
-  <div class="container py-5">
-      <div class="row justify-content-center">
-          <div class="col-lg-10 text-center">
-              <h1 class="display-3 text-white animated slideInDown">Book Consultation</h1>
-              <nav aria-label="breadcrumb">
-                  <ol class="breadcrumb justify-content-center">
-                      <li class="breadcrumb-item"><a class="text-white" href="/">Home</a></li>
-                      <li class="breadcrumb-item text-white active" aria-current="page">Book Consultation</li>
-                  </ol>
-              </nav>
-          </div>
-      </div>
-  </div>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center">
+                <h1 class="display-3 text-white animated slideInDown">Create Consultation</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-center">
+                        <li class="breadcrumb-item"><a class="text-white" href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a class="text-white" href="/client/">Client Profile</a></li>
+                        <li class="breadcrumb-item text-white active" aria-current="page">Create Consultation</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
 </div>
 <!-- Header End -->
-    <div class="container">
-      <div class="section-title">
-        <h2>Book a Consultation</h2>
-        <p>Fill in the details to book a consultation</p>
-      </div>
 
-      <form action="/consultation/create" method="POST">
-        <div class="mb-3">
-          <label for="serviceId" class="form-label">Service</label>
-          <select class="form-select" id="serviceId" name="serviceId" required>
-            <!-- Populate services dynamically -->
-            <% services.forEach(service => { %>
-              <option value="<%= service._id %>"><%= service.name %></option>
-            <% }) %>
-          </select>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Create a Consultation</h2>
+                </div>
+                <div class="card-body">
+                    <% if (locals.error) { %>
+                        <div class="alert alert-danger" role="alert">
+                            <%= error %>
+                        </div>
+                    <% } %>
+                    <form id="consultation-form" action="/consultation/create" method="POST">
+                        <div class="mb-3">
+                            <label for="serviceId" class="form-label">Service</label>
+                            <select id="serviceId" name="serviceId" class="form-select" required>
+                                <option value="" selected disabled>Choose a service</option>
+                                <% services.forEach(service => { %>
+                                    <option value="<%= service._id %>"><%= service.name %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+
+                        <div id="specializationSelection" class="mb-3" style="display: none;">
+                            <label for="specialization" class="form-label">Specialization</label>
+                            <select id="specialization" name="specialization" class="form-select" required>
+                            </select>
+                        </div>
+
+                        <div id="consultantSelection" class="mb-3" style="display: none;">
+                            <label for="consultantId" class="form-label">Available Consultants</label>
+                            <select id="consultantId" name="consultantId" class="form-select" required>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="dateTime" class="form-label">Date and Time</label>
+                            <input type="datetime-local" id="dateTime" name="dateTime" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="duration" class="form-label">Duration (minutes)</label>
+                            <input type="number" id="duration" name="duration" class="form-control" required min="30" step="30">
+                        </div>
+
+                        <div id="additionalOptions" class="mb-3"></div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">Create Consultation</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="mb-3">
-          <label for="date" class="form-label">Date</label>
-          <input type="datetime-local" class="form-control" id="date" name="date" required>
-        </div>
-        <div class="mb-3">
-          <label for="duration" class="form-label">Duration (in minutes)</label>
-          <input type="number" class="form-control" id="duration" name="duration" required>
-        </div>
-        <div class="mb-3">
-          <label for="mode" class="form-label">Mode</label>
-          <select class="form-select" id="mode" name="mode" required>
-            <option value="Online">Online</option>
-            <option value="In-person">In-person</option>
-          </select>
-        </div>
-        <div class="mb-3">
-          <label for="notes" class="form-label">Notes</label>
-          <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
-        </div>
-        <div class="mb-3">
-          <label for="specializations" class="form-label">Specializations</label>
-          <select class="form-select" id="specializations" name="specializations[]" multiple required>
-            <!-- Populate specializations dynamically -->
-            <% specializations.forEach(specialization => { %>
-              <option value="<%= specialization %>"><%= specialization %></option>
-            <% }) %>
-          </select>
-        </div>
-        <button type="submit" class="btn btn-primary">Book Consultation</button>
-      </form>
     </div>
+</div>
+
+<script>
+    const serviceSelect = document.getElementById('serviceId');
+    const specializationSelect = document.getElementById('specialization');
+    const consultantSelect = document.getElementById('consultantId');
+    const specializationSelection = document.getElementById('specializationSelection');
+    const consultantSelection = document.getElementById('consultantSelection');
+    const additionalOptionsDiv = document.getElementById('additionalOptions');
+
+    serviceSelect.addEventListener('change', async () => {
+        const serviceId = serviceSelect.value;
+        
+        // Fetch specializations for the selected service
+        const specializationsResponse = await fetch(`/service/${serviceId}/specializations`);
+        const specializations = await specializationsResponse.json();
+
+        // Populate specialization select
+        specializationSelect.innerHTML = '<option value="" selected disabled>Choose a specialization</option>';
+        specializations.forEach(specialization => {
+            const option = document.createElement('option');
+            option.value = specialization;
+            option.textContent = specialization;
+            specializationSelect.appendChild(option);
+        });
+
+        // Show specialization selection if specializations are available
+        if (specializations.length > 0) {
+            specializationSelection.style.display = 'block';
+        } else {
+            specializationSelection.style.display = 'none';
+            alert('No specializations available for this service. Please choose another service.');
+        }
+
+        // Hide consultant selection until a specialization is chosen
+        consultantSelection.style.display = 'none';
+
+        // Fetch and display additional options
+        const serviceResponse = await fetch(`/service/${serviceId}`);
+        const service = await serviceResponse.json();
+        additionalOptionsDiv.innerHTML = '<h5 class="mb-3">Additional Options:</h5>';
+        service.additionalOptions.forEach(option => {
+            const optionDiv = document.createElement('div');
+            optionDiv.className = 'form-check mb-2';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.name = 'selectedOptions';
+            checkbox.value = option.name;
+            checkbox.id = `option-${option.name}`;
+            checkbox.className = 'form-check-input';
+            
+            const label = document.createElement('label');
+            label.htmlFor = `option-${option.name}`;
+            label.className = 'form-check-label';
+            label.textContent = `${option.name} (+${option.price} ${service.currency})`;
+            
+            optionDiv.appendChild(checkbox);
+            optionDiv.appendChild(label);
+            additionalOptionsDiv.appendChild(optionDiv);
+        });
+    });
+
+    specializationSelect.addEventListener('change', async () => {
+        const serviceId = serviceSelect.value;
+        const specialization = specializationSelect.value;
+        
+        // Fetch available consultants for the selected service and specialization
+        const consultantsResponse = await fetch(`/consultant/by-service-and-specialization/${serviceId}/${specialization}`);
+        const consultants = await consultantsResponse.json();
+
+        // Populate consultant select
+        consultantSelect.innerHTML = '<option value="" selected disabled>Choose a consultant</option>';
+        consultants.forEach(consultant => {
+            const option = document.createElement('option');
+            option.value = consultant._id;
+            option.textContent = `${consultant.firstName} ${consultant.lastName}`;
+            consultantSelect.appendChild(option);
+        });
+
+        // Show consultant selection if consultants are available
+        if (consultants.length > 0) {
+            consultantSelection.style.display = 'block';
+        } else {
+            consultantSelection.style.display = 'none';
+            alert('No consultants available for this specialization. Please choose another specialization.');
+        }
+    });
+
+    // Prevent form from submitting if required fields are not filled
+    document.getElementById('consultation-form').addEventListener('submit', function(event) {
+        if (!this.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        this.classList.add('was-validated');
+    });
+</script>

@@ -1,0 +1,46 @@
+<% layout('layouts/boilerplate') %>
+<title>Consultation Confirmation</title>
+
+<!-- Header Start -->
+<div class="container-fluid bg-black py-5 mb-5 page-header">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center">
+                <h1 class="display-3 text-white animated slideInDown">Consultation Confirmation</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-center">
+                        <li class="breadcrumb-item"><a class="text-white" href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a class="text-white" href="/client/">Client Profile</a></li>
+                        <li class="breadcrumb-item text-white active" aria-current="page">Edit Profile</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Header End -->
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-success text-white">
+                    <h2 class="mb-0">Consultation Confirmed</h2>
+                </div>
+                <div class="card-body">
+                    <h4 class="card-title">Thank you for your payment!</h4>
+                    <p class="card-text">Your consultation has been successfully booked and paid for.</p>
+                    <div class="mb-4">
+                        <p><strong>Consultant:</strong> <%= consultation.consultant.firstName %> <%= consultation.consultant.lastName %></p>
+                        <p><strong>Service:</strong> <%= consultation.service.name %></p>
+                        <p><strong>Date and Time:</strong> <%= new Date(consultation.dateTime).toLocaleString() %></p>
+                        <p><strong>Duration:</strong> <%= consultation.duration %> minutes</p>
+                        <p><strong>Price Paid:</strong> <%= consultation.price %> <%= consultation.service.currency %></p>
+                    </div>
+                    <p>You will receive a confirmation email shortly with additional details.</p>
+                    <a href="/client/" class="btn btn-primary">Return to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

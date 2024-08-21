@@ -19,6 +19,7 @@ const serviceSchema = new Schema({
     trim: true,
     maxlength: 200
   },
+  specializations: [{ type: String }], // Array of specializations offered by this service
   category: { 
     type: String, 
     required: true,
@@ -37,7 +38,8 @@ const serviceSchema = new Schema({
   basePrice: { 
     type: Number, 
     required: true,
-    min: 0
+    min: 0,
+    set: v => Math.round(v * 100) / 100 // Rounds to 2 decimal places
   },
   currency: {
     type: String,
@@ -103,7 +105,11 @@ const serviceSchema = new Schema({
   additionalOptions: [{
     name: String,
     description: String,
-    price: Number
+    price: {
+      type: Number,
+      min: 0,
+      set: v => Math.round(v * 100) / 100 // Rounds to 2 decimal places
+    }
   }]
 }, { 
   timestamps: true,
@@ -111,24 +117,34 @@ const serviceSchema = new Schema({
   toObject: { virtuals: true }
 });
 
-// Virtual for formatted price
+// Update the virtual for formatted price
 serviceSchema.virtual('formattedPrice').get(function() {
-  return `${this.basePrice.toFixed(2)} ${this.currency}`;
+  if (typeof this.basePrice === 'number' && !isNaN(this.basePrice) && this.currency) {
+    return `${this.basePrice.toFixed(2)} ${this.currency}`;
+  }
+  return 'Price not available';
 });
 
 // Index for efficient querying
 serviceSchema.index({ name: 1, category: 1, isActive: 1 });
 
 // Method to calculate total price including additional options
-serviceSchema.methods.calculateTotalPrice = function(selectedOptions = []) {
+serviceSchema.methods.calculateTotalPrice = function(selectedOptions = [], duration) {
   let total = this.basePrice;
+
+  // If the price model is hourly, adjust the base price for the duration
+  if (this.priceModel === 'Hourly') {
+    total = (this.basePrice / 60) * duration;
+  }
+
   selectedOptions.forEach(option => {
     const additionalOption = this.additionalOptions.find(o => o.name === option);
     if (additionalOption) {
       total += additionalOption.price;
     }
   });
-  return total;
+
+  return Math.round(total * 100) / 100; // Round to 2 decimal places
 };
 
 const Service = mongoose.model('Service', serviceSchema);

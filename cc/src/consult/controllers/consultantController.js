@@ -1,5 +1,6 @@
 const Consultant = require('../../consult/models/consultantModel');
 const Consultation = require('../../consult/models/consultationModel');
+const Service = require('../../consult/models/serviceModel');
 const User = require('../../auth/models/userModel');
 const multer = require('multer');
 
@@ -115,6 +116,23 @@ const consultantController = {
             }
         }
     ],
+
+    getConsultantsByService: async (req, res) => {
+        try {
+            const { serviceId } = req.params;
+            const consultants = await Consultant.find({ specializations: serviceId })
+                .populate('user', 'firstName lastName');
+            
+            res.json(consultants.map(consultant => ({
+                _id: consultant._id,
+                firstName: consultant.user.firstName,
+                lastName: consultant.user.lastName
+            })));
+        } catch (err) {
+            console.error('Error fetching consultants by service:', err);
+            res.status(500).json({ message: 'Error fetching consultants', error: err.message });
+        }
+    },
 
     pickConsultation: async (req, res) => {
         try {
@@ -233,7 +251,43 @@ const consultantController = {
         } catch (err) {
             res.status(500).json({ message: 'Error updating availability', error: err.message });
         }
-    }
+    },
+
+    // New method to get all unique specializations
+    getAllSpecializations: async (req, res) => {
+        try {
+            const specializations = await Consultant.distinct('specializations');
+            res.status(200).json(specializations);
+        } catch (err) {
+            res.status(500).json({ message: 'Error fetching specializations', error: err.message });
+        }
+    },
+
+    // Update the existing method to get consultants by specialization
+    getConsultantsByServiceAndSpecialization: async (req, res) => {
+        try {
+          const { serviceId, specialization } = req.params;
+    
+          // Verify that the service has this specialization
+          const service = await Service.findById(serviceId);
+          if (!service || !service.specializations.includes(specialization)) {
+            return res.status(400).json({ message: 'Invalid service-specialization combination' });
+          }
+    
+          const consultants = await Consultant.find({ specializations: specialization })
+            .populate('user', 'firstName lastName');
+          
+          const formattedConsultants = consultants.map(consultant => ({
+            _id: consultant._id,
+            firstName: consultant.user.firstName,
+            lastName: consultant.user.lastName
+          }));
+    
+          res.status(200).json(formattedConsultants);
+        } catch (err) {
+          res.status(500).json({ message: 'Error fetching consultants', error: err.message });
+        }
+    },
 };
 
 module.exports = consultantController;

@@ -1,6 +1,5 @@
-// serviceController.js
-
 const Service = require('../models/serviceModel');
+const Consultant = require('../models/consultantModel');
 
 const serviceController = {
     // Create a new service
@@ -32,8 +31,11 @@ const serviceController = {
             if (!service) {
                 return res.status(404).json({ message: 'Service not found' });
             }
-            res.status(200).render('services/serviceDetails', { service });
-            // res.status(200).json(service);
+            res.status(200).render('services/serviceDetails', { 
+                service,
+                formattedPrice: service.formattedPrice,
+                totalPrice: service.calculateTotalPrice([], service.duration)
+            });
         } catch (err) {
             res.status(500).json({ message: 'Error fetching service', error: err.message });
         }
@@ -104,6 +106,53 @@ const serviceController = {
             res.status(200).json(services);
         } catch (err) {
             res.status(500).json({ message: 'Error searching services', error: err.message });
+        }
+    },
+    
+    // New method: Get specializations for a service
+    getServiceSpecializations: async (req, res) => {
+        try {
+            const service = await Service.findById(req.params.id);
+            if (!service) {
+                return res.status(404).json({ message: 'Service not found' });
+            }
+            res.status(200).json(service.specializations || []);
+        } catch (err) {
+            res.status(500).json({ message: 'Error fetching specializations', error: err.message });
+        }
+    },
+
+    // Add a new method to calculate total price
+    calculateTotalPrice: async (req, res) => {
+        try {
+            const { serviceId, selectedOptions, duration } = req.body;
+            const service = await Service.findById(serviceId);
+            if (!service) {
+                return res.status(404).json({ message: 'Service not found' });
+            }
+            const totalPrice = service.calculateTotalPrice(selectedOptions, duration);
+            res.status(200).json({ totalPrice });
+        } catch (err) {
+            res.status(500).json({ message: 'Error calculating total price', error: err.message });
+        }
+    },
+
+    // New method: Get consultants by specialization
+    getConsultantsBySpecialization: async (req, res) => {
+        try {
+            const { specialization } = req.params;
+            const consultants = await Consultant.find({ specializations: specialization })
+                .populate('user', 'firstName lastName');
+            
+            const formattedConsultants = consultants.map(consultant => ({
+                _id: consultant._id,
+                firstName: consultant.user.firstName,
+                lastName: consultant.user.lastName
+            }));
+
+            res.status(200).json(formattedConsultants);
+        } catch (err) {
+            res.status(500).json({ message: 'Error fetching consultants', error: err.message });
         }
     }
 };

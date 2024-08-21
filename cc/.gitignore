@@ -1,11 +1,23 @@
 node_modules/
 .env
-src/utils/db.js
-src/utils/ExpressError.js
+logs
+src/app.js
 src/admin
 src/auth
 src/dev
-logs
+src/routes
+src/utils/db.js
+src/utils/ExpressError.js
 src/routes/
 src/utils/emailService.js
 src/views/emails
+src/views/admin
+src/views/clients
+src/views/consultants
+
+# Ignore SSL certificates
+localhost-key.pem
+localhost.pem
+
+# Ignore macOS system files
+.DS_Store

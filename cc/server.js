@@ -1,5 +1,7 @@
 const app = require('./src/app');
 const mongoose = require('mongoose');
+const https = require('https');
+const fs = require('fs');
 
 // Initialize environment variables
 const dotenv = require('dotenv');
@@ -17,8 +19,18 @@ db.once("open", () => {
 });
 
 const PORT = process.env.PORT || 4500;
-app.listen(PORT, () => {
-    console.log(`Serving on port ${PORT}`);
-});
 
+if (process.env.NODE_ENV !== 'production') {
+    const httpsOptions = {
+        key: fs.readFileSync('localhost-key.pem'),
+        cert: fs.readFileSync('localhost.pem')
+    };
 
+    https.createServer(httpsOptions, app).listen(PORT, () => {
+        console.log(`HTTPS server running on https://localhost:${PORT}`);
+    });
+} else {
+    app.listen(PORT, () => {
+        console.log(`HTTP server running on port ${PORT}`);
+    });
+}
