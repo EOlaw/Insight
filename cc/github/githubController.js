@@ -2,11 +2,15 @@ const fs = require('fs');
 const path = require('path');
 const simpleGit = require('simple-git');
 
+// Update this line to point to the correct repositories directory
 const REPOS_DIR = path.join(__dirname, '..', 'repositories');
+
+console.log('Repositories directory:', REPOS_DIR); // Log the repositories directory path
 
 // Ensure repositories directory exists
 if (!fs.existsSync(REPOS_DIR)) {
   fs.mkdirSync(REPOS_DIR, { recursive: true });
+  console.log('Created repositories directory:', REPOS_DIR);
 }
 
 const githubController = {
@@ -33,12 +37,21 @@ const githubController = {
     res.json({ message: 'Push notification received' });
   },
   listRepos: (req, res) => {
+    console.log('listRepos function called'); // Log when the function is called
+  
     fs.readdir(REPOS_DIR, (err, files) => {
       if (err) {
+        console.error('Error reading repositories directory:', err);
         return res.status(500).render('github/error', { error: 'Failed to read repositories' });
       }
-      res.render('github/repos', { repos: files.filter(file => fs.statSync(path.join(REPOS_DIR, file)).isDirectory()) });
-    });
+      
+      console.log('Files in repositories directory:', files); // Log all files in the directory
+      
+      const repos = files.filter(file => fs.statSync(path.join(REPOS_DIR, file)).isDirectory());
+      console.log('Found repositories:', repos);
+      
+      res.render('github/repos', { repos: repos });
+      });
   },
   getRepoDetails: (req, res) => {
     const { repoName } = req.params;
