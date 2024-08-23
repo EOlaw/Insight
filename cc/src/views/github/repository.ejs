@@ -1,0 +1,67 @@
+<!-- views/repository.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= repository.name %> - Insightserenity</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <%- include('partials/header') %>
+    
+    <main>
+        <h1><%= repository.name %></h1>
+        <p><%= repository.description %></p>
+        
+        <h2>Branches</h2>
+        <ul>
+            <% branches.forEach(branch => { %>
+                <li><a href="/repository/<%= repository._id %>/branch/<%= branch %>"><%= branch %></a></li>
+            <% }); %>
+        </ul>
+        
+        <h2>Recent Commits</h2>
+        <ul>
+            <% commits.forEach(commit => { %>
+                <li>
+                    <a href="/repository/<%= repository._id %>/commit/<%= commit.hash %>"><%= commit.hash.substring(0, 7) %></a>
+                    - <%= commit.message %> by <%= commit.author.username %> on <%= commit.created_at.toLocaleString() %>
+                </li>
+            <% }); %>
+        </ul>
+        
+        <h2>Pull Requests</h2>
+        <ul>
+            <% pullRequests.forEach(pr => { %>
+                <li>
+                    <a href="/repository/<%= repository._id %>/pull/<%= pr._id %>">#<%= pr._id %></a>
+                    - <%= pr.title %> by <%= pr.author.username %> (<%= pr.status %>)
+                </li>
+            <% }); %>
+        </ul>
+        
+        <h2>Issues</h2>
+        <ul>
+            <% issues.forEach(issue => { %>
+                <li>
+                    <a href="/repository/<%= repository._id %>/issue/<%= issue._id %>">#<%= issue._id %></a>
+                    - <%= issue.title %> (<%= issue.status %>)
+                </li>
+            <% }); %>
+        </ul>
+        
+        <h2>Wiki</h2>
+        <ul>
+            <% wikiPages.forEach(page => { %>
+                <li>
+                    <a href="/repository/<%= repository._id %>/wiki/<%= page._id %>"><%= page.title %></a>
+                </li>
+            <% }); %>
+        </ul>
+    </main>
+    
+    <%- include('partials/footer') %>
+    <script src="/js/repository.js"></script>
+</body>
+</html>

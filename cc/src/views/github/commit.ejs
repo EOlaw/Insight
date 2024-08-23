@@ -1,0 +1,31 @@
+<!-- views/commit.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commit <%= commit.hash.substring(0, 7) %> - Insightserenity</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <%- include('partials/header') %>
+    
+    <main>
+        <h1>Commit <%= commit.hash.substring(0, 7) %></h1>
+        <p><%= commit.message %></p>
+        <p>Author: <%= commit.author.username %></p>
+        <p>Date: <%= commit.created_at.toLocaleString() %></p>
+        
+        <h2>Changes</h2>
+        <% commit.changes.forEach(change => { %>
+            <div class="file-change">
+                <h3><%= change.file %></h3>
+                <pre><code><%= change.diff %></code></pre>
+            </div>
+        <% }); %>
+    </main>
+    
+    <%- include('partials/footer') %>
+    <script src="/js/commit.js"></script>
+</body>
+</html>

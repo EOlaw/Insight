@@ -1,0 +1,79 @@
+<!-- views/issue.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Issue #<%= issue._id %> - <%= issue.title %> - Insightserenity</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <%- include('partials/header') %>
+    
+    <main>
+        <h1>Issue #<%= issue._id %>: <%= issue.title %></h1>
+        <p>Status: <%= issue.status %></p>
+        <p>Priority: <%= issue.priority %></p>
+        <p>Author: <%= issue.author.username %></p>
+        <p>Created: <%= issue.createdAt.toLocaleString() %></p>
+        <p>Last Updated: <%= issue.updatedAt.toLocaleString() %></p>
+        
+        <h2>Description</h2>
+        <p><%= issue.description %></p>
+        
+        <h2>Labels</h2>
+        <ul>
+            <% issue.labels.forEach(label => { %>
+                <li><%= label %></li>
+            <% }); %>
+        </ul>
+        
+        <h2>Assignees</h2>
+        <ul>
+            <% issue.assignees.forEach(assignee => { %>
+                <li><%= assignee.username %></li>
+            <% }); %>
+        </ul>
+        
+        <h2>Comments</h2>
+        <% issue.comments.forEach(comment => { %>
+            <div class="comment">
+                <p><strong><%= comment.author.username %></strong> - <%= comment.createdAt.toLocaleString() %></p>
+                <p><%= comment.content %></p>
+            </div>
+        <% }); %>
+        
+        <h3>Add a Comment</h3>
+        <form id="comment-form">
+            <textarea name="content" required></textarea>
+            <button type="submit">Add Comment</button>
+        </form>
+        
+        <% if (user.role === 'admin' || user.role === 'developer') { %>
+            <h3>Update Issue</h3>
+            <form id="update-issue-form">
+                <label for="status">Status:</label>
+                <select name="status" id="status">
+                    <option value="open" <%= issue.status === 'open' ? 'selected' : '' %>>Open</option>
+                    <option value="in_progress" <%= issue.status === 'in_progress' ? 'selected' : '' %>>In Progress</option>
+                    <option value="resolved" <%= issue.status === 'resolved' ? 'selected' : '' %>>Resolved</option>
+                    <option value="closed" <%= issue.status === 'closed' ? 'selected' : '' %>>Closed</option>
+                </select>
+                
+                <label for="priority">Priority:</label>
+                <select name="priority" id="priority">
+                    <option value="low" <%= issue.priority === 'low' ? 'selected' : '' %>>Low</option>
+                    <option value="medium" <%= issue.priority === 'medium' ? 'selected' : '' %>>Medium</option>
+                    <option value="high" <%= issue.priority === 'high' ? 'selected' : '' %>>High</option>
+                    <option value="critical" <%= issue.priority === 'critical' ? 'selected' : '' %>>Critical</option>
+                </select>
+                
+                <button type="submit">Update Issue</button>
+            </form>
+        <% } %>
+    </main>
+    
+    <%- include('partials/footer') %>
+    <script src="/js/issue.js"></script>
+</body>
+</html>

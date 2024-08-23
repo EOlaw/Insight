@@ -1,0 +1,44 @@
+<!-- views/pullRequest.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pull Request #<%= pullRequest._id %> - Insightserenity</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <%- include('partials/header') %>
+    
+    <main>
+        <h1>Pull Request #<%= pullRequest._id %></h1>
+        <h2><%= pullRequest.title %></h2>
+        <p><%= pullRequest.description %></p>
+        <p>Author: <%= pullRequest.author.username %></p>
+        <p>Status: <%= pullRequest.status %></p>
+        <p>Source Branch: <%= pullRequest.sourceBranch %></p>
+        <p>Target Branch: <%= pullRequest.targetBranch %></p>
+        
+        <h2>Reviews</h2>
+        <% reviews.forEach(review => { %>
+            <div class="review">
+                <p>Reviewer: <%= review.reviewer.username %></p>
+                <p>Status: <%= review.status %></p>
+                <h3>Comments</h3>
+                <% review.comments.forEach(comment => { %>
+                    <div class="comment">
+                        <p>Line <%= comment.line %>: <%= comment.content %></p>
+                    </div>
+                <% }); %>
+            </div>
+        <% }); %>
+        
+        <% if (pullRequest.status === 'open' && user.role === 'admin') { %>
+            <button id="merge-pr">Merge Pull Request</button>
+        <% } %>
+    </main>
+    
+    <%- include('partials/footer') %>
+    <script src="/js/pullRequest.js"></script>
+</body>
+</html>
