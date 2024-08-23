@@ -78,17 +78,30 @@ const clientController = {
         upload.single('avatar'),
         async (req, res) => {
             try {
-                const { company, industry, billingAddress, preferredServices, firstName, lastName, email, phoneNumber } = req.body;
+                const { company, bio, industry, billingAddress, preferredServices, primaryContact, firstName, lastName, email, phoneNumber } = req.body;
                 
+                // Process preferredServices
+                let processedPreferredServices = [];
+                if (preferredServices) {
+                    processedPreferredServices = preferredServices.split(',').map(service => service.trim()).filter(service => service !== '');
+                }
+
                 // Validate input
                 if (billingAddress && typeof billingAddress !== 'string') {
                     return res.status(400).render('error', { statusCode: 400, message: 'Billing address must be a string' });
                 }
-                if (preferredServices && (!Array.isArray(preferredServices) || preferredServices.length === 0)) {
-                    return res.status(400).render('error', { statusCode: 400, message: 'Preferred services must be a non-empty array' });
+                if (processedPreferredServices.length === 0) {
+                    return res.status(400).render('error', { statusCode: 400, message: 'Preferred services must contain at least one service' });
                 }
 
-                let clientUpdateData = { company, industry, billingAddress, preferredServices };
+                let clientUpdateData = { 
+                    company, 
+                    bio,
+                    industry, 
+                    billingAddress, 
+                    preferredServices: processedPreferredServices,
+                    primaryContact
+                };
                 let userUpdateData = { firstName, lastName, email, phoneNumber };
 
                 // Handle file upload
@@ -123,6 +136,7 @@ const clientController = {
 
                 res.status(200).redirect('/client/');
             } catch (err) {
+                console.error('Error updating client profile:', err);
                 res.status(500).render('error', { statusCode: 500, message: 'Error updating client profile', error: err.message });
             }
         }

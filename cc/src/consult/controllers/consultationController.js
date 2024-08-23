@@ -61,6 +61,11 @@ const consultationController = {
             client.consultationHistory.push(newConsultation._id);
             await client.save();
 
+            // Inside createConsultation function:
+            consultant.consultationHistory.push(newConsultation._id);
+            await consultant.save();
+
+
             // Send payment waiting notification email
             try {
                 await emailService.sendPaymentWaitingNotification(client.user, newConsultation);

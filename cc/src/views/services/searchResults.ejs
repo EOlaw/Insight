@@ -1,0 +1,91 @@
+<% layout('layouts/boilerplate') %>
+
+<!-- Header Start -->
+<div class="container-fluid bg-black py-5 mb-5 page-header">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center">
+                <h1 class="display-3 text-white animated slideInDown">Search Results</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-center">
+                        <li class="breadcrumb-item"><a class="text-white" href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a class="text-white" href="/service">Services</a></li>
+                        <li class="breadcrumb-item text-white active" aria-current="page">Search Results</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Header End -->
+
+<!-- Search Results Section -->
+<section id="search-results" class="services">
+    <div class="container" data-aos="fade-up">
+        <div class="section-title">
+            <h2>Search Results for "<%= query %>"</h2>
+            <p>Discover Our Services Tailored to Your Needs</p>
+        </div>
+
+        <% if (services.length > 0) { %>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                <% services.forEach(service => { %>
+                    <div class="col-lg-4 col-md-6 d-flex align-items-stretch mt-4" data-aos="zoom-in" data-aos-delay="<%= (services.indexOf(service) + 1) * 100 %>">
+                        <div class="card h-100 shadow-sm">
+                            <% if (service.imageUrl) { %>
+                                <img src="<%= service.imageUrl %>" class="card-img-top" alt="<%= service.name %>">
+                            <% } else { %>
+                                <div class="card-img-top bg-light text-center py-5">
+                                    <i class="bi bi-briefcase" style="font-size: 3rem;"></i>
+                                </div>
+                            <% } %>
+                            <div class="card-body">
+                                <h5 class="card-title"><a href="/service/<%= service._id %>"><%= service.name %></a></h5>
+                                <p class="card-text"><%= service.shortDescription || (service.description && service.description.substring(0, 100) + '...') || 'No description available' %></p>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Duration
+                                        <span class="badge bg-primary rounded-pill"><%= service.duration %> min</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Price
+                                        <span class="badge bg-success rounded-pill">$ <%= formattedPrice(calculateTotalPrice(service)) %></span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Category
+                                        <span class="badge bg-info rounded-pill"><%= service.category %></span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card-footer">
+                                <small class="text-muted">
+                                    Available: 
+                                    <%= service.availableOnline ? 'Online' : '' %>
+                                    <%= service.availableOnline && service.availableInPerson ? ' & ' : '' %>
+                                    <%= service.availableInPerson ? 'In Person' : '' %>
+                                </small>
+                                <% if (service.rating && service.rating.count > 0) { %>
+                                    <div class="mt-2">
+                                        <% for (let i = 1; i <= 5; i++) { %>
+                                            <i class="bi <%= i <= Math.round(service.rating.average) ? 'bi-star-fill' : 'bi-star' %> text-warning"></i>
+                                        <% } %>
+                                        <small class="text-muted ml-1">(<%= service.rating.count %> reviews)</small>
+                                    </div>
+                                <% } %>
+                                <div class="mt-3">
+                                    <a href="/service/<%= service._id %>" class="btn btn-primary btn-sm">Learn More</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } else { %>
+            <div class="alert alert-info text-center" role="alert">
+                <h4 class="alert-heading">No services found matching your search</h4>
+                <p class="mb-0">Try different keywords or browse our service categories for more options.</p>
+            </div>
+        <% } %>
+    </div>
+</section>
+<!-- End Search Results Section -->

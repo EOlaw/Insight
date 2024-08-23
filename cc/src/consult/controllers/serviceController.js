@@ -96,6 +96,9 @@ const serviceController = {
     searchServices: async (req, res) => {
         try {
             const query = req.query.q;
+            if (!query) {
+                return res.status(400).render('error', { message: 'Search query is required' });
+            }
             const services = await Service.find({
                 $or: [
                     { name: { $regex: query, $options: 'i' } },
@@ -103,9 +106,15 @@ const serviceController = {
                     { tags: { $in: [new RegExp(query, 'i')] } }
                 ]
             });
-            res.status(200).json(services);
+            res.render('services/searchResults', { 
+                services, 
+                query,
+                formattedPrice: (price) => `$${price.toFixed(2)}`,
+                calculateTotalPrice: (service) => service.calculateTotalPrice([], service.duration)
+            });
         } catch (err) {
-            res.status(500).json({ message: 'Error searching services', error: err.message });
+            console.error('Error searching services:', err);
+            res.status(500).render('error', { message: 'Error searching services', error: err.message });
         }
     },
     

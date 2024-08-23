@@ -15,11 +15,42 @@
   .welcome-text {
     color: white;
   }
+  .navbar-search {
+    position: relative;
+  }
+  .navbar-search .form-control {
+    padding-right: 2.5rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+  }
+  .navbar-search .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .navbar-search .btn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: none;
+    border: none;
+    color: white;
+  }
+  .logo {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #ffffff;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .logo span {
+    color: #00c6ff;
+  }
 </style>
 
 <header id="header" class="fixed-top">
   <div class="container d-flex align-items-center justify-content-between">
-    <h1 class="logo"><a href="/">IS<span>.</span></a></h1>
+    <h1 class="logo"><a href="/">Insightserenity<span>.</span></a></h1>
     
     <nav id="navbar" class="navbar">
       <ul class="d-flex align-items-center justify-content-center w-100">
@@ -28,6 +59,16 @@
         <li><a class="nav-link scrollto" href="/service/">Services</a></li>
         <li><a class="nav-link scrollto" href="/team">Team</a></li>
         <li><a class="nav-link scrollto" href="/contact">Contact</a></li>
+        <li>
+          <form action="/service/search" method="GET" class="navbar-search ms-3">
+            <div class="input-group">
+              <input type="text" class="form-control" name="q" placeholder="Search services..." aria-label="Search services">
+              <button class="btn" type="submit">
+                <i class="bi bi-search"></i>
+              </button>
+            </div>
+          </form>
+        </li>
       </ul>
     </nav><!-- .navbar -->
 
@@ -49,6 +90,10 @@
             <span class="welcome-text">Welcome, <%= currentUser.firstName %></span>
           </button>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <% if (currentUser.isAdmin) { %>
+              <li><a class="dropdown-item" href="/admin/dashboard"><i class="bi bi-speedometer2 me-2"></i>Admin Dashboard</a></li>
+              <li><hr class="dropdown-divider"></li>
+            <% } %>
             <li><a class="dropdown-item" href="/<%= currentUser.role %>/"><i class="bi bi-person-circle me-2"></i>Profile</a></li>
             <li><a class="dropdown-item" href="#"><i class="bi bi-question-circle me-2"></i>Help & Support</a></li>
             <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings & Privacy</a></li>

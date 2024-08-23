@@ -7,10 +7,18 @@ const clientSchema = new Schema({
   bio: { type: String, maxLength: 500 },
   industry: { type: String },
   billingAddress: { type: String },
-  preferredServices: [{ type: String }],
+  preferredServices: { 
+    type: [{ type: String }], 
+    default: ['General Consultation'], // Add this line
+    validate: {
+      validator: function(array) {
+        return array.length > 0;
+      },
+      message: 'Preferred services must contain at least one service.'
+    }
+  },
   consultationHistory: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Consultation' }],
   feedback: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Feedback' }],
-  // New fields
   clientSince: { type: Date, default: Date.now },
   primaryContact: { type: String },
   companySize: { type: String, enum: ['1-10', '11-50', '51-200', '201-500', '500+'] },

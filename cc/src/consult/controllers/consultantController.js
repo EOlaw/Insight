@@ -18,17 +18,24 @@ const consultantController = {
                     path: 'consultationHistory',
                     populate: {
                         path: 'client',
-                        select: 'firstName lastName'
+                        select: 'firstName lastName',
+                        populate: {
+                            path: 'user', // This ensures that you can access user fields like firstName and lastName
+                            select: 'firstName lastName'
+                        }
                     }
                 });
+    
             if (!consultant) {
                 return res.status(404).json({ message: 'Consultant profile not found' });
             }
+    
             res.status(200).render('consultants/profile', { consultant });
         } catch (err) {
             res.status(500).json({ message: 'Error fetching consultant profile', error: err.message });
         }
     },
+    
     // Edit Form
     renderEditProfile: async (req, res) => {
         try {
