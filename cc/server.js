@@ -18,9 +18,6 @@ db.once("open", () => {
     console.log("Database connected");
 });
 
-const githubRoutes = require('./github/githubRoutes');
-app.use('/github', githubRoutes);
-
 const PORT = process.env.PORT || 4500;
 
 if (process.env.NODE_ENV !== 'production') {

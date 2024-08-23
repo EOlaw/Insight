@@ -35,7 +35,7 @@ const githubController = {
   listRepos: (req, res) => {
     fs.readdir(REPOS_DIR, (err, files) => {
       if (err) {
-        return res.status(500).render('error', { error: 'Failed to read repositories' });
+        return res.status(500).render('github/error', { error: 'Failed to read repositories' });
       }
       res.render('github/repos', { repos: files.filter(file => fs.statSync(path.join(REPOS_DIR, file)).isDirectory()) });
     });
