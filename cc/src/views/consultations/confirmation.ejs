@@ -28,17 +28,41 @@
                     <h2 class="mb-0">Consultation Confirmed</h2>
                 </div>
                 <div class="card-body">
-                    <h4 class="card-title">Thank you for your payment!</h4>
-                    <p class="card-text">Your consultation has been successfully booked and paid for.</p>
-                    <div class="mb-4">
-                        <p><strong>Consultant:</strong> <%= consultation.consultant.firstName %> <%= consultation.consultant.lastName %></p>
-                        <p><strong>Service:</strong> <%= consultation.service.name %></p>
-                        <p><strong>Date and Time:</strong> <%= new Date(consultation.dateTime).toLocaleString() %></p>
-                        <p><strong>Duration:</strong> <%= consultation.duration %> minutes</p>
-                        <p><strong>Price Paid:</strong> <%= consultation.price %> <%= consultation.service.currency %></p>
+                    <h4 class="card-title">Thank you for booking your consultation!</h4>
+                    <p class="card-text">Your consultation has been successfully scheduled and paid for. Here are the details:</p>
+                    
+                    <ul class="list-group list-group-flush mb-4">
+                        <li class="list-group-item"><strong>Consultant:</strong> <%= consultation.consultant.user.firstName %> <%= consultation.consultant.user.lastName %></li>
+                        <li class="list-group-item"><strong>Service:</strong> <%= consultation.service.name %></li>
+                        <li class="list-group-item"><strong>Specialization:</strong> <%= consultation.specialization %></li>
+                        <li class="list-group-item"><strong>Date and Time:</strong> <%= new Date(consultation.dateTime).toLocaleString() %></li>
+                        <li class="list-group-item"><strong>Duration:</strong> <%= consultation.duration %> minutes</li>
+                        <li class="list-group-item"><strong>Original Price:</strong> <%= consultation.price.toFixed(2) %> <%= consultation.service.currency %></li>
+                        
+                        <% if (consultation.appliedPriceFactors && consultation.appliedPriceFactors.length > 0) { %>
+                            <li class="list-group-item">
+                                <strong>Applied Discounts:</strong>
+                                <ul>
+                                    <% consultation.appliedPriceFactors.forEach(factor => { %>
+                                        <% if (factor.factor < 1) { %>
+                                            <li><%= factor.name %>: -<%= (consultation.price * (1 - factor.factor)).toFixed(2) %> <%= consultation.service.currency %></li>
+                                        <% } %>
+                                    <% }) %>
+                                </ul>
+                            </li>
+                        <% } %>
+
+                        <li class="list-group-item"><strong>Final Price Paid:</strong> <%= consultation.finalPrice.toFixed(2) %> <%= consultation.service.currency %></li>
+                        <li class="list-group-item"><strong>Total Savings:</strong> <%= (consultation.price - consultation.finalPrice).toFixed(2) %> <%= consultation.service.currency %></li>
+                    </ul>
+
+                    <p class="card-text">An email confirmation has been sent to your registered email address.</p>
+                    <p class="card-text">If you need to make any changes or have any questions, please contact us.</p>
+
+                    <div class="d-grid gap-2">
+                        <a href="/client/" class="btn btn-primary">Return to Dashboard</a>
+                        <a href="/" class="btn btn-secondary">Return to Home</a>
                     </div>
-                    <p>You will receive a confirmation email shortly with additional details.</p>
-                    <a href="/client/" class="btn btn-primary">Return to Dashboard</a>
                 </div>
             </div>
         </div>

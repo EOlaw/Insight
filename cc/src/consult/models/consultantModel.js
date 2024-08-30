@@ -17,14 +17,44 @@ const consultantSchema = new Schema({
   employeeId: { 
     type: String, 
     unique: true,
+    immutable: true, // This makes the field unchangeable after it's set
     default: function() {
       return 'CONS-' + Math.random().toString(36).substr(2, 9).toUpperCase();
     }
   },
-  isEmployeeIdVerified: { type: Boolean, default: false },
+  isEmployeeIdVerified: { 
+    type: Boolean, 
+    default: false
+  },
   hireDate: { type: Date, default: Date.now },
   
 }, { timestamps: true });
+
+// Middleware to prevent changes to employeeId
+consultantSchema.pre('save', function(next) {
+  if (!this.isNew && this.isModified('employeeId')) {
+    const error = new Error('employeeId cannot be modified');
+    return next(error);
+  }
+  next();
+});
+
+// Static method to verify or unverify employeeId (to be used by admin)
+consultantSchema.statics.setEmployeeIdVerification = async function(consultantId, isVerified, adminUser) {
+  if (!adminUser.isAdmin) {
+    throw new Error('Only administrators can modify employee ID verification status');
+  }
+  
+  const consultant = await this.findById(consultantId);
+  if (!consultant) {
+    throw new Error('Consultant not found');
+  }
+  
+  consultant.isEmployeeIdVerified = isVerified;
+  await consultant.save();
+  
+  return consultant;
+};
 
 const Consultant = mongoose.model('Consultant', consultantSchema);
 module.exports = Consultant;

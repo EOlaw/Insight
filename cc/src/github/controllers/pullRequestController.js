@@ -18,8 +18,8 @@ const pullRequestController = {
             const pullRequest = new PullRequest({
                 title,
                 description,
-                source_branch: sourceBranch,
-                target_branch: targetBranch,
+                sourceBranch,
+                targetBranch,
                 repository: repositoryId,
                 author
             });
@@ -28,6 +28,18 @@ const pullRequestController = {
             res.status(201).json({ message: 'Pull request created successfully', pullRequest });
         } catch (error) {
             res.status(500).json({ error: 'Failed to create pull request' });
+        }
+    },
+
+    getPullRequests: async (req, res) => {
+        try {
+            const { repositoryId } = req.params;
+            const pullRequests = await PullRequest.find({ repository: repositoryId })
+                .populate('author', 'username')
+                .populate('reviewers', 'username');
+            res.status(200).json(pullRequests);
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to fetch pull requests' });
         }
     },
 
@@ -43,8 +55,8 @@ const pullRequestController = {
             const repoPath = path.join(__dirname, '../../../repositories', pullRequest.repository.name);
             const git = simpleGit(repoPath);
 
-            await git.checkout(pullRequest.target_branch);
-            await git.merge([pullRequest.source_branch]);
+            await git.checkout(pullRequest.targetBranch);
+            await git.merge([pullRequest.sourceBranch]);
 
             pullRequest.status = 'merged';
             await pullRequest.save();

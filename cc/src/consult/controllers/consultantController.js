@@ -20,71 +20,74 @@ const consultantController = {
                         path: 'client',
                         select: 'firstName lastName',
                         populate: {
-                            path: 'user', // This ensures that you can access user fields like firstName and lastName
+                            path: 'user',
                             select: 'firstName lastName'
                         }
                     }
                 });
-    
+
             if (!consultant) {
                 return res.status(404).json({ message: 'Consultant profile not found' });
             }
-    
+
             res.status(200).render('consultants/profile', { consultant });
         } catch (err) {
             res.status(500).json({ message: 'Error fetching consultant profile', error: err.message });
         }
     },
-    
+
     // Edit Form
     renderEditProfile: async (req, res) => {
         try {
             const consultant = await Consultant.findOne({ user: req.user._id }).populate('user')
-            if (!consultant) return res.status(404).json({ error: 'Client profile not found' });
+            if (!consultant) return res.status(404).json({ error: 'Consultant profile not found' });
             res.status(200).render('consultants/edit', { consultant })
-        } catch {
+        } catch (err) {
             res.status(500).json({ error: err.message })
         }
     },
-
     // Update Consultant Profile
     updateConsultantProfile: [
-    upload.single('avatar'),
+        upload.single('avatar'),
         async (req, res) => {
             try {
                 const { 
-                    firstName, lastName, email, phoneNumber,
                     specializations, yearsOfExperience, certifications,
-                    department, position, employeeId, hireDate
+                    department, position, hireDate,
+                    firstName, lastName, email, phoneNumber
                 } = req.body;
-                
+
+                // Process specializations
+                let processedSpecializations = specializations ? specializations.split(',').map(s => s.trim()).filter(s => s !== '') : [];
+
                 // Validate input
-                if (specializations) {
-                    const specializationsArray = specializations.split(',').map(s => s.trim());
-                    if (specializationsArray.length === 0) {
-                        return res.status(400).json({ message: 'Specializations must be a non-empty array' });
-                    }
+                if (processedSpecializations.length === 0) {
+                    return res.status(400).render('error', { statusCode: 400, message: 'Specializations must contain at least one specialization' });
                 }
                 if (yearsOfExperience && (isNaN(yearsOfExperience) || Number(yearsOfExperience) < 0)) {
-                    return res.status(400).json({ message: 'Years of experience must be a non-negative number' });
+                    return res.status(400).render('error', { statusCode: 400, message: 'Years of experience must be a non-negative number' });
                 }
 
-                let userUpdateData = { firstName, lastName, email, phoneNumber };
                 let consultantUpdateData = { 
-                    specializations: specializations ? specializations.split(',').map(s => s.trim()) : undefined,
+                    specializations: processedSpecializations,
                     yearsOfExperience: yearsOfExperience ? Number(yearsOfExperience) : undefined,
                     department,
                     position,
-                    employeeId,
                     hireDate: hireDate ? new Date(hireDate) : undefined
                 };
+                let userUpdateData = { firstName, lastName, email, phoneNumber };
 
                 // Handle certifications
-                if (certifications) {
-                    consultantUpdateData.certifications = certifications.split('\n').map(cert => {
-                        const [name, issuer] = cert.split('-').map(s => s.trim());
-                        return { name, issuer };
-                    });
+                if (req.body.certifications) {
+                    consultantUpdateData.certifications = req.body.certifications.filter(cert => 
+                        cert.name && cert.issuer && cert.dateObtained && cert.expiryDate && cert.credentialID
+                    ).map(cert => ({
+                        name: cert.name,
+                        issuer: cert.issuer,
+                        dateObtained: new Date(cert.dateObtained),
+                        expiryDate: new Date(cert.expiryDate),
+                        credentialID: cert.credentialID
+                    }));
                 }
 
                 // Handle file upload
@@ -103,7 +106,7 @@ const consultantController = {
                 );
 
                 if (!updatedUser) {
-                    return res.status(404).json({ message: 'User not found' });
+                    return res.status(404).render('error', { statusCode: 404, message: 'User not found' });
                 }
 
                 // Update Consultant model
@@ -114,12 +117,13 @@ const consultantController = {
                 ).populate('user', '-password');
 
                 if (!updatedConsultant) {
-                    return res.status(404).json({ message: 'Consultant profile not found' });
+                    return res.status(404).render('error', { statusCode: 404, message: 'Consultant profile not found' });
                 }
 
                 res.status(200).redirect('/consultant/');
             } catch (err) {
-                res.status(500).json({ message: 'Error updating consultant profile', error: err.message });
+                console.error('Error updating consultant profile:', err);
+                res.status(500).render('error', { statusCode: 500, message: 'Error updating consultant profile', error: err.message });
             }
         }
     ],
@@ -129,7 +133,7 @@ const consultantController = {
             const { serviceId } = req.params;
             const consultants = await Consultant.find({ specializations: serviceId })
                 .populate('user', 'firstName lastName');
-            
+
             res.json(consultants.map(consultant => ({
                 _id: consultant._id,
                 firstName: consultant.user.firstName,
@@ -145,59 +149,51 @@ const consultantController = {
         try {
             const { consultationId } = req.params;
             const consultantId = req.user._id;
-    
+
             // Find the consultation and ensure it's available
             const consultation = await Consultation.findById(consultationId);
             if (!consultation) {
                 return res.status(404).json({ message: 'Consultation not found' });
             }
-    
+
             if (consultation.consultant) {
                 return res.status(400).json({ message: 'This consultation has already been assigned to a consultant' });
             }
-    
+
             // Check if the consultant is qualified for this consultation
             const consultant = await Consultant.findOne({ user: consultantId });
             if (!consultant) {
                 return res.status(404).json({ message: 'Consultant profile not found' });
             }
-    
-            // You might want to add more checks here, e.g., 
-            // - Does the consultant have the required specializations?
-            // - Is the consultant available at the consultation time?
-    
+
             // Assign the consultant to the consultation
             consultation.consultant = consultantId;
-            consultation.status = 'assigned'; // You might want to update the status
-    
+            consultation.status = 'assigned';
+
             await consultation.save();
-    
-            // You might also want to update the consultant's schedule here
-    
+
             res.status(200).json({ 
                 message: 'Consultation successfully picked', 
                 consultation: consultation 
             });
-    
+
         } catch (err) {
             res.status(500).json({ message: 'Error picking consultation', error: err.message });
         }
     },
-    
-    // Also, let's add a function to view available consultations
-    
+
     getConsultationsView: async (req, res) => {
         try {
             const availableConsultations = await Consultation.find({ 
                 consultant: null, 
                 dateTime: { $gt: new Date() }
             }).populate('client', 'username').populate('service', 'name');
-    
+
             const pickedConsultations = await Consultation.find({
                 consultant: req.user._id,
                 dateTime: { $gt: new Date() }
             }).populate('client', 'username').populate('service', 'name');
-    
+
             res.render('consultants/consultations', { 
                 consultations: availableConsultations,
                 pickedConsultations: pickedConsultations
@@ -207,13 +203,12 @@ const consultantController = {
         }
     },
 
-    // Get Consultant's Consultations
     getConsultantConsultations: async (req, res) => {
         try {
             const consultations = await Consultation.find({ consultant: req.user._id })
                 .populate('client', 'username')
                 .populate('service', 'name')
-                .sort({ dateTime: -1 });  // Sort by date, most recent first
+                .sort({ dateTime: -1 });
 
             res.status(200).json(consultations);
         } catch (err) {
@@ -221,7 +216,6 @@ const consultantController = {
         }
     },
 
-    // Get Consultant's Availability
     getConsultantAvailability: async (req, res) => {
         try {
             const consultant = await Consultant.findOne({ user: req.user._id });
@@ -234,12 +228,10 @@ const consultantController = {
         }
     },
 
-    // Update Consultant's Availability
     updateConsultantAvailability: async (req, res) => {
         try {
             const { availabilitySchedule } = req.body;
-            
-            // Validate input
+
             if (!availabilitySchedule || typeof availabilitySchedule !== 'object') {
                 return res.status(400).json({ message: 'Invalid availability schedule format' });
             }
@@ -260,7 +252,6 @@ const consultantController = {
         }
     },
 
-    // New method to get all unique specializations
     getAllSpecializations: async (req, res) => {
         try {
             const specializations = await Consultant.distinct('specializations');
@@ -270,26 +261,24 @@ const consultantController = {
         }
     },
 
-    // Update the existing method to get consultants by specialization
     getConsultantsByServiceAndSpecialization: async (req, res) => {
         try {
           const { serviceId, specialization } = req.params;
-    
-          // Verify that the service has this specialization
+
           const service = await Service.findById(serviceId);
           if (!service || !service.specializations.includes(specialization)) {
             return res.status(400).json({ message: 'Invalid service-specialization combination' });
           }
-    
+
           const consultants = await Consultant.find({ specializations: specialization })
             .populate('user', 'firstName lastName');
-          
+
           const formattedConsultants = consultants.map(consultant => ({
             _id: consultant._id,
             firstName: consultant.user.firstName,
             lastName: consultant.user.lastName
           }));
-    
+
           res.status(200).json(formattedConsultants);
         } catch (err) {
           res.status(500).json({ message: 'Error fetching consultants', error: err.message });

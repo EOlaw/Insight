@@ -1,4 +1,5 @@
 <% layout('layouts/boilerplate') %>
+<title>Error</title>
 
 <!-- Header Start -->
 <div class="container-fluid bg-black py-5 mb-5 page-header">
@@ -18,41 +19,54 @@
 </div>
 <!-- Header End -->
 
-<% layout('layouts/boilerplate') %>
-
-<!-- 404 Start -->
+<!-- Error Start -->
 <div class="container-xxl py-5 wow fadeInUp" data-wow-delay="0.1s">
     <div class="container text-center">
         <div class="row justify-content-center">
             <div class="col-lg-6">
-                <% if (statusCode === 404) { %>
+                <% if (typeof statusCode !== 'undefined' && statusCode === 404) { %>
                     <i class="bi bi-exclamation-triangle display-1 text-primary"></i>
                     <h1 class="display-1"><%= statusCode %></h1>
                     <h1 class="mb-4"><%= message %></h1>
                     <p class="mb-4">We're sorry, the page you have looked for does not exist in our website! Maybe go to our home page or try to use a search?</p>
-                    <a class="btn btn-primary rounded-pill py-3 px-5" href="/">Go Back To Home</a>
                 <% } else { %>
-                    <i class="bi bi-exclamation-circle display-1 text-danger"></i>
-                    <h1 class="display-1"><%= statusCode %></h1>
+                    <i class="bi bi-exclamation-circle display-1 text-primary"></i>
+                    <h1 class="display-1"><%= typeof statusCode !== 'undefined' ? statusCode : 'Error' %></h1>
                     <h1 class="mb-4"><%= message %></h1>
-                    <p class="mb-4">We're sorry, something went wrong. Our team has been notified and we're working on it.</p>
-                    <a class="btn btn-primary rounded-pill py-3 px-5" href="/">Go Back To Home</a>
+                    <p class="mb-4">We're sorry, an unexpected error occurred. Please try again later or contact support if the problem persists.</p>
                 <% } %>
+                <button id="goBackButton" class="btn btn-primary rounded-pill py-3 px-5">Go Back</button>
             </div>
         </div>
     </div>
 </div>
-<!-- 404 End -->
-
-<% if (process.env.NODE_ENV === 'development' && error) { %>
-    <div class="container mt-5">
-        <h2>Error Details (Development Only)</h2>
-        <pre><%= JSON.stringify(error, null, 2) %></pre>
-    </div>
-<% } %>
+<!-- Error End -->
 
 <script>
-    function goBack() {
-        window.history.back();
+// Function to go back to the previous page
+function goBack() {
+    window.history.back();
+}
+
+// Function to check if there's a previous page
+function hasPreviousPage() {
+    return window.history.length > 1;
+}
+
+// Function to update the button text and behavior
+function updateButton() {
+    const button = document.getElementById('goBackButton');
+    if (hasPreviousPage()) {
+        button.textContent = 'Go Back';
+        button.onclick = goBack;
+    } else {
+        button.textContent = 'Go To Home';
+        button.onclick = function() {
+            window.location.href = '/';
+        };
     }
+}
+
+// Call updateButton when the page loads
+window.onload = updateButton;
 </script>

@@ -26,7 +26,8 @@ const clientController = {
                         select: 'firstName lastName'
                     }
                 })
-                .sort({ dateTime: -1 });
+                .sort({ dateTime: -1 })
+                .limit(10);  // Limit to the 10 most recent consultations
             
             console.log('Consultations:', JSON.stringify(consultations, null, 2));
             
@@ -52,7 +53,7 @@ const clientController = {
                 }
                 return consultationObject;
             });
-
+        
             res.status(200).render('clients/profile', { 
                 user: clientObject,
                 currentUser: req.user

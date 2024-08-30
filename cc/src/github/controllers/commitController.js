@@ -130,7 +130,8 @@ const commitController = {
             // Fetch commits authored by the authenticated user
             const commits = await Commit.find({ author }).populate('repository', 'name');
 
-            res.status(200).json(commits);
+            // res.status(200).json(commits);
+            res.status(200).render('github/commit', { coommits })
         } catch (error) {
             res.status(500).json({ message: 'Error fetching commits', error });
         }

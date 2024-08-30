@@ -68,6 +68,13 @@
 
                         <div id="additionalOptions" class="mb-3"></div>
 
+                        <div id="priceBreakdown" class="mb-3">
+                            <h5>Price Breakdown:</h5>
+                            <p>Original Price: <span id="originalPrice">0</span> <span id="currency"></span></p>
+                            <div id="appliedDiscounts"></div>
+                            <p><strong>Final Price: <span id="finalPrice">0</span> <span id="currency"></span></strong></p>
+                        </div>
+
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary btn-lg">Create Consultation</button>
                         </div>
@@ -82,18 +89,80 @@
     const serviceSelect = document.getElementById('serviceId');
     const specializationSelect = document.getElementById('specialization');
     const consultantSelect = document.getElementById('consultantId');
-    const specializationSelection = document.getElementById('specializationSelection');
-    const consultantSelection = document.getElementById('consultantSelection');
+    const dateTimeInput = document.getElementById('dateTime');
+    const durationInput = document.getElementById('duration');
     const additionalOptionsDiv = document.getElementById('additionalOptions');
 
+    async function updatePriceBreakdown() {
+        const serviceId = serviceSelect.value;
+        const specialization = specializationSelect.value;
+        const consultantId = consultantSelect.value;
+        const dateTime = dateTimeInput.value;
+        const duration = durationInput.value;
+        const selectedOptions = Array.from(document.querySelectorAll('input[name="selectedOptions"]:checked')).map(el => el.value);
+
+        if (!serviceId || !specialization || !consultantId || !dateTime || !duration) {
+            return;
+        }
+
+        try {
+            const response = await fetch('/consultation/calculate-price', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    serviceId,
+                    specialization,
+                    consultantId,
+                    dateTime,
+                    duration,
+                    selectedOptions,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch price');
+            }
+
+            const priceData = await response.json();
+
+            document.getElementById('originalPrice').textContent = priceData.originalPrice.toFixed(2);
+            document.getElementById('finalPrice').textContent = priceData.finalPrice.toFixed(2);
+            document.getElementById('currency').textContent = priceData.currency;
+
+            const appliedDiscountsDiv = document.getElementById('appliedDiscounts');
+            appliedDiscountsDiv.innerHTML = '';
+            priceData.appliedFactors.forEach(factor => {
+                if (factor.factor < 1) {  // This is a discount
+                    const discountAmount = (priceData.originalPrice * (1 - factor.factor)).toFixed(2);
+                    const discountP = document.createElement('p');
+                    discountP.textContent = `${factor.name}: -${discountAmount} ${priceData.currency}`;
+                    appliedDiscountsDiv.appendChild(discountP);
+                }
+            });
+        } catch (error) {
+            console.error('Error updating price:', error);
+        }
+    }
+
+    [serviceSelect, specializationSelect, consultantSelect, dateTimeInput, durationInput].forEach(el => {
+        el.addEventListener('change', updatePriceBreakdown);
+    });
+
+    additionalOptionsDiv.addEventListener('change', (event) => {
+        if (event.target.type === 'checkbox') {
+            updatePriceBreakdown();
+        }
+    });
+
     serviceSelect.addEventListener('change', async () => {
+        // Existing code for populating specializations
         const serviceId = serviceSelect.value;
         
-        // Fetch specializations for the selected service
         const specializationsResponse = await fetch(`/service/${serviceId}/specializations`);
         const specializations = await specializationsResponse.json();
 
-        // Populate specialization select
         specializationSelect.innerHTML = '<option value="" selected disabled>Choose a specialization</option>';
         specializations.forEach(specialization => {
             const option = document.createElement('option');
@@ -102,7 +171,6 @@
             specializationSelect.appendChild(option);
         });
 
-        // Show specialization selection if specializations are available
         if (specializations.length > 0) {
             specializationSelection.style.display = 'block';
         } else {
@@ -110,10 +178,8 @@
             alert('No specializations available for this service. Please choose another service.');
         }
 
-        // Hide consultant selection until a specialization is chosen
         consultantSelection.style.display = 'none';
 
-        // Fetch and display additional options
         const serviceResponse = await fetch(`/service/${serviceId}`);
         const service = await serviceResponse.json();
         additionalOptionsDiv.innerHTML = '<h5 class="mb-3">Additional Options:</h5>';
@@ -137,17 +203,17 @@
             optionDiv.appendChild(label);
             additionalOptionsDiv.appendChild(optionDiv);
         });
+
+        updatePriceBreakdown();
     });
 
     specializationSelect.addEventListener('change', async () => {
         const serviceId = serviceSelect.value;
         const specialization = specializationSelect.value;
         
-        // Fetch available consultants for the selected service and specialization
         const consultantsResponse = await fetch(`/consultant/by-service-and-specialization/${serviceId}/${specialization}`);
         const consultants = await consultantsResponse.json();
 
-        // Populate consultant select
         consultantSelect.innerHTML = '<option value="" selected disabled>Choose a consultant</option>';
         consultants.forEach(consultant => {
             const option = document.createElement('option');
@@ -156,16 +222,18 @@
             consultantSelect.appendChild(option);
         });
 
-        // Show consultant selection if consultants are available
         if (consultants.length > 0) {
             consultantSelection.style.display = 'block';
         } else {
             consultantSelection.style.display = 'none';
             alert('No consultants available for this specialization. Please choose another specialization.');
         }
+
+        updatePriceBreakdown();
     });
 
-    // Prevent form from submitting if required fields are not filled
+    window.addEventListener('load', updatePriceBreakdown);
+
     document.getElementById('consultation-form').addEventListener('submit', function(event) {
         if (!this.checkValidity()) {
             event.preventDefault();

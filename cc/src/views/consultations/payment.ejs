@@ -48,11 +48,21 @@
                 </div>
                 <div class="card-body">
                     <div class="mb-4">
-                        <p><strong>Consultant:</strong> <%= consultation.consultant.firstName %> <%= consultation.consultant.lastName %></p>
+                        <p><strong>Consultant:</strong> <%= consultation.consultant.user.firstName %> <%= consultation.consultant.user.lastName %></p>
                         <p><strong>Service:</strong> <%= consultation.service.name %></p>
                         <p><strong>Date and Time:</strong> <%= new Date(consultation.dateTime).toLocaleString() %></p>
                         <p><strong>Duration:</strong> <%= consultation.duration %> minutes</p>
-                        <p><strong>Price:</strong> <%= consultation.price %> <%= consultation.service.currency %></p>
+                        <p><strong>Original Price:</strong> <%= consultation.price.toFixed(2) %> <%= consultation.currency %></p>
+                        
+                        <% if (consultation.appliedPriceFactors && consultation.appliedPriceFactors.length > 0) { %>
+                            <h5>Applied Factors:</h5>
+                            <% consultation.appliedPriceFactors.forEach(factor => { %>
+                                <p><%= factor.name %>: <%= factor.factor < 1 ? 'Discount' : 'Increase' %> of <%= Math.abs((1 - factor.factor) * 100).toFixed(2) %>%</p>
+                            <% }) %>
+                        <% } %>
+
+                        <p><strong>Final Price:</strong> <%= consultation.finalPrice.toFixed(2) %> <%= consultation.currency %></p>
+                        <p><strong>Total Savings:</strong> <%= (consultation.price - consultation.finalPrice).toFixed(2) %> <%= consultation.currency %></p>
                     </div>
 
                     <form id="payment-form">
@@ -149,19 +159,17 @@
             const responseText = await response.text();
             console.log('Response body:', responseText);
 
-            if (!response.ok) {
-                let errorMessage = `HTTP error! status: ${response.status}`;
-                try {
-                    const errorJson = JSON.parse(responseText);
-                    errorMessage += `, error: ${errorJson.error || 'Unknown error'}`;
-                } catch (e) {
-                    errorMessage += `, body: ${responseText}`;
-                }
-                throw new Error(errorMessage);
+            let result;
+            try {
+                result = JSON.parse(responseText);
+            } catch (e) {
+                console.error('Failed to parse response as JSON:', e);
+                throw new Error('Received invalid response from server');
             }
 
-            const result = JSON.parse(responseText);
-            console.log('Parsed result:', result);
+            if (!response.ok) {
+                throw new Error(result.error || 'Unknown error occurred');
+            }
 
             if (!result.clientSecret) {
                 throw new Error('No client secret received from the server');
@@ -176,6 +184,7 @@
             if (error) {
                 throw error;
             } else if (paymentIntent.status === 'succeeded') {
+                console.log('Payment succeeded, confirming on server');
                 // Call the confirmPayment endpoint
                 const confirmResponse = await fetch('/consultation/<%= consultation._id %>/confirm-payment', {
                     method: 'POST',
@@ -183,8 +192,19 @@
                     body: JSON.stringify({ paymentIntentId: paymentIntent.id })
                 });
 
-                if (!confirmResponse.ok) {
-                    throw new Error('Failed to confirm payment on the server');
+                const confirmResponseText = await confirmResponse.text();
+                console.log('Confirm payment response:', confirmResponseText);
+
+                let confirmResult;
+                try {
+                    confirmResult = JSON.parse(confirmResponseText);
+                } catch (e) {
+                    console.error('Failed to parse confirm response as JSON:', e);
+                    throw new Error('Received invalid response from server during confirmation');
+                }
+
+                if (!confirmResponse.ok || !confirmResult.success) {
+                    throw new Error(confirmResult.error || 'Failed to confirm payment on the server');
                 }
 
                 successElement.style.display = 'block';
@@ -192,7 +212,7 @@
                     window.location.href = '/consultation/<%= consultation._id %>/confirmation';
                 }, 2000);
             } else {
-                throw new Error('Payment failed');
+                throw new Error(`Unexpected payment status: ${paymentIntent.status}`);
             }
         } catch (error) {
             console.error('Payment error:', error);

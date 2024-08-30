@@ -1,0 +1,524 @@
+<% layout('layouts/boilerplate') %>
+
+<%
+function getStatusBadgeClass(status) {
+    switch(status) {
+        case 'pending_payment': return 'warning';
+        case 'scheduled': return 'success';
+        case 'completed': return 'info';
+        case 'cancelled': return 'danger';
+        default: return 'secondary';
+    }
+}
+%>
+
+<!-- Header Start -->
+<div class="container-fluid bg-black py-5 mb-5 page-header">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center">
+                <h1 class="display-3 text-white fw-bold mb-3">Consultation Details</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-center">
+                        <li class="breadcrumb-item"><a class="text-white" href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a class="text-white" href="/client/">Client Profile</a></li>
+                        <li class="breadcrumb-item text-white active" aria-current="page">Consultation Details</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Header End -->
+
+<div class="container py-5">
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="card-title h4 mb-4">Consultation Information</h2>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-calendar-event text-primary me-2 fs-4"></i>
+                                <div>
+                                    <h6 class="mb-0">Date and Time</h6>
+                                    <small class="text-muted"><%= new Date(consultation.dateTime).toLocaleString() %></small>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-clock text-primary me-2 fs-4"></i>
+                                <div>
+                                    <h6 class="mb-0">Duration</h6>
+                                    <small class="text-muted"><%= consultation.duration %> minutes</small>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-currency-dollar text-primary me-2 fs-4"></i>
+                                <div>
+                                    <h6 class="mb-0">Price</h6>
+                                    <small class="text-muted">$<%= consultation.price.toFixed(2) %></small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-person text-primary me-2 fs-4"></i>
+                                <div>
+                                    <h6 class="mb-0">Client</h6>
+                                    <small class="text-muted"><%= consultation.client.user.firstName %> <%= consultation.client.user.lastName %></small>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-person-badge text-primary me-2 fs-4"></i>
+                                <div>
+                                    <h6 class="mb-0">Consultant</h6>
+                                    <small class="text-muted"><%= consultation.consultant.user.firstName %> <%= consultation.consultant.user.lastName %></small>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-tag text-primary me-2 fs-4"></i>
+                                <div>
+                                    <h6 class="mb-0">Service</h6>
+                                    <small class="text-muted"><%= consultation.service.name %></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="mb-4">
+                        <h5 class="mb-3">Status</h5>
+                        <% 
+                        let badgeClass;
+                        switch(consultation.status) {
+                            case 'pending_payment':
+                                badgeClass = 'warning';
+                                break;
+                            case 'scheduled':
+                                badgeClass = 'success';
+                                break;
+                            case 'completed':
+                                badgeClass = 'info';
+                                break;
+                            case 'cancelled':
+                                badgeClass = 'danger';
+                                break;
+                            default:
+                                badgeClass = 'secondary';
+                        }
+                        %> 
+                        <span class="badge bg-<%= badgeClass %> p-2 fs-6">
+                            <%= consultation.status.charAt(0).toUpperCase() + consultation.status.slice(1) %>
+                        </span>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="mb-3">Selected Options</h5>
+                        <% if (consultation.selectedOptions && consultation.selectedOptions.length > 0) { %>
+                            <ul class="list-group list-group-flush">
+                                <% consultation.selectedOptions.forEach(option => { %>
+                                    <li class="list-group-item"><i class="bi bi-check-circle-fill text-success me-2"></i><%= option %></li>
+                                <% }); %>
+                            </ul>
+                        <% } else { %>
+                            <p class="text-muted">No additional options selected</p>
+                        <% } %>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="mb-3">Status History</h5>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% consultation.statusHistory.forEach(history => { %>
+                                        <tr>
+                                            <td><%= history.status.charAt(0).toUpperCase() + history.status.slice(1) %></td>
+                                            <td><%= new Date(history.changedAt).toLocaleString() %></td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <% if (consultation.followUpActions && consultation.followUpActions.length > 0) { %>
+                        <div class="mb-4">
+                            <h5 class="mb-3">Follow-up Actions</h5>
+                            <ul class="list-group list-group-flush">
+                                <% consultation.followUpActions.forEach(action => { %>
+                                    <li class="list-group-item"><i class="bi bi-arrow-right-circle-fill text-primary me-2"></i><%= action %></li>
+                                <% }); %>
+                            </ul>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Summary -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Quick Summary</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><strong>Consultation ID:</strong> <%= consultation._id.toString().slice(-6).toUpperCase() %></li>
+                        <li class="mb-2"><strong>Status:</strong> <span class="badge bg-<%= badgeClass %>"><%= consultation.status %></span></li>
+                        <li class="mb-2"><strong>Date:</strong> <%= new Date(consultation.dateTime).toLocaleDateString() %></li>
+                        <li><strong>Time:</strong> <%= new Date(consultation.dateTime).toLocaleTimeString() %></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Quick Actions</h5>
+                    <div class="d-grid gap-2">
+                        <% if (consultation.status === 'scheduled') { %>
+                            <a href="/consultation/<%= consultation._id %>/reschedule" class="btn btn-outline-primary">
+                                <i class="bi bi-calendar-plus me-2"></i>Reschedule
+                            </a>
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                                <i class="bi bi-x-circle me-2"></i>Cancel Consultation
+                            </button>
+                        <% } %>
+                        <button type="button" class="btn btn-outline-secondary position-relative" data-bs-toggle="modal" data-bs-target="#notesModal" id="notesButton">
+                            <i class="bi bi-journal-text me-2"></i>Notes
+                            <% if (unreadNotesCount > 0) { %>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    <%= unreadNotesCount %>
+                                    <span class="visually-hidden">unread notes</span>
+                                </span>
+                            <% } %>
+                        </button>
+                        <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#messageModal">
+                            <i class="bi bi-chat-dots me-2"></i>Send Message
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Related Consultations -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Related Consultations</h5>
+                    <% if (relatedConsultations && relatedConsultations.length > 0) { %>
+                        <ul class="list-group list-group-flush">
+                            <% relatedConsultations.forEach(relatedConsultation => { %>
+                                <li class="list-group-item">
+                                    <a href="/consultation/<%= relatedConsultation._id %>" class="text-decoration-none">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-0"><%= relatedConsultation.service.name %></h6>
+                                                <small class="text-muted"><%= new Date(relatedConsultation.dateTime).toLocaleDateString() %></small>
+                                            </div>
+                                            <span class="badge bg-<%= getStatusBadgeClass(relatedConsultation.status) %>"><%= relatedConsultation.status %></span>
+                                        </div>
+                                    </a>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    <% } else { %>
+                        <p class="text-muted">No related consultations found.</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelModalLabel">Cancel Consultation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to cancel this consultation? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <form action="/consultation/<%= consultation._id %>/cancel" method="POST">
+                    <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Follow-up Actions Modal (for consultants) -->
+<% if (currentUser.role === 'consultant') { %>
+    <div class="modal fade" id="addFollowUpModal" tabindex="-1" aria-labelledby="addFollowUpModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addFollowUpModalLabel">Add Follow-up Actions</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="/consultation/<%= consultation._id %>/follow-up" method="POST">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="followUpActions" class="form-label">Follow-up Actions</label>
+                            <textarea class="form-control" id="followUpActions" name="followUpActions" rows="3" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save Follow-up Actions</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+<% } %>
+
+<!-- Notes Modal -->
+<div class="modal fade" id="notesModal" tabindex="-1" aria-labelledby="notesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="card" id="chat2">
+                <div class="card-header d-flex justify-content-between align-items-center p-3">
+                    <h5 class="mb-0">Communication Log</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="card-body" data-mdb-perfect-scrollbar="true" style="position: relative; height: 400px; overflow-y: auto;">
+                    <div id="notesContainer">
+                        <% if (consultation.notes && consultation.notes.length > 0) { %>
+                            <% consultation.notes.forEach(note => { %>
+                                <% const isCurrentUser = note.author._id.toString() === currentUser._id.toString(); %>
+                                <div class="d-flex flex-row justify-content-<%= isCurrentUser ? 'end' : 'start' %> mb-4 pt-1">
+                                    <% if (!isCurrentUser) { %>
+                                        <div class="profile-image-container me-3">
+                                            <% if (note.author.profile && note.author.profile.avatar && note.author.profile.avatar.data) { %>
+                                                <img src="data:<%= note.author.profile.avatar.contentType %>;base64,<%= Buffer.from(note.author.profile.avatar.data).toString('base64') %>"
+                                                     alt="Profile Picture" 
+                                                     class="rounded-circle d-flex align-self-start shadow-1-strong" width="60">
+                                            <% } else { %>
+                                                <img src="/default-avatar.png" 
+                                                     alt="Default Profile Picture" 
+                                                     class="rounded-circle d-flex align-self-start shadow-1-strong" width="60">
+                                            <% } %>
+                                        </div>
+                                    <% } %>
+                                    <div>
+                                        <p class="small p-2 <%= isCurrentUser ? 'me-3 text-white rounded-3 bg-primary' : 'ms-3 rounded-3 bg-body-tertiary' %>">
+                                            <%= note.text %>
+                                        </p>
+                                        <p class="small <%= isCurrentUser ? 'me-3' : 'ms-3' %> mb-3 rounded-3 text-muted">
+                                            <%= note.author.firstName %> <%= note.author.lastName %>
+                                            (<%= note.authorRole.charAt(0).toUpperCase() + note.authorRole.slice(1) %>)
+                                            • <%= new Date(note.createdAt).toLocaleString() %>
+                                        </p>
+                                    </div>
+                                    <% if (isCurrentUser) { %>
+                                        <div class="profile-image-container ms-3">
+                                            <% if (currentUser.profile && currentUser.profile.avatar && currentUser.profile.avatar.data) { %>
+                                                <img src="data:<%= currentUser.profile.avatar.contentType %>;base64,<%= Buffer.from(currentUser.profile.avatar.data).toString('base64') %>"
+                                                     alt="Profile Picture" 
+                                                     class="rounded-circle d-flex align-self-start shadow-1-strong" width="60">
+                                            <% } else { %>
+                                                <img src="/default-avatar.png" 
+                                                     alt="Default Profile Picture" 
+                                                     class="rounded-circle d-flex align-self-start shadow-1-strong" width="60">
+                                            <% } %>
+                                        </div>
+                                    <% } %>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <div class="text-center py-5">
+                                <i class="bi bi-chat-dots fs-1 text-muted"></i>
+                                <p class="mt-3 text-muted">No messages yet. Start the conversation!</p>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+                <div class="card-footer text-muted d-flex justify-content-start align-items-center p-3">
+                    <div class="profile-image-container me-3">
+                        <% if (currentUser.profile && currentUser.profile.avatar && currentUser.profile.avatar.data) { %>
+                            <img src="data:<%= currentUser.profile.avatar.contentType %>;base64,<%= Buffer.from(currentUser.profile.avatar.data).toString('base64') %>"
+                                 alt="Profile Picture" 
+                                 class="rounded-circle d-flex align-self-start shadow-1-strong" width="40">
+                        <% } else { %>
+                            <img src="/default-avatar.png" 
+                                 alt="Default Profile Picture" 
+                                 class="rounded-circle d-flex align-self-start shadow-1-strong" width="40">
+                        <% } %>
+                    </div>
+                    <input type="text" class="form-control form-control-lg" id="noteText" placeholder="Type message">
+                    <a class="ms-3" href="#!" id="sendMessageBtn"><i class="fas fa-paper-plane"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Send Message Modal -->
+<div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="messageModalLabel">Send Message</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/consultation/<%= consultation._id %>/message" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message</label>
+                        <textarea class="form-control" id="message" name="message" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Send Message</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    #chat2 .form-control {
+        border-color: transparent;
+    }
+    #chat2 .form-control:focus {
+        border-color: transparent;
+        box-shadow: inset 0px 0px 0px 1px transparent;
+    }
+    .divider:after,
+    .divider:before {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #eee;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const notesContainer = document.getElementById('notesContainer');
+        const noteText = document.getElementById('noteText');
+        const sendMessageBtn = document.getElementById('sendMessageBtn');
+
+        function addNote(e) {
+            e.preventDefault();
+            const text = noteText.value.trim();
+            if (text) {
+                fetch('/consultation/<%= consultation._id %>/notes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ noteText: text }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === 'Note added successfully') {
+                        noteText.value = '';
+                        refreshNotes();
+                    } else {
+                        alert('Error adding note: ' + data.message);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('Error adding note');
+                });
+            }
+        }
+
+        sendMessageBtn.addEventListener('click', addNote);
+        noteText.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addNote(e);
+            }
+        });
+
+        function refreshNotes() {
+            fetch('/consultation/<%= consultation._id %>/notes')
+            .then(response => response.json())
+            .then(data => {
+                notesContainer.innerHTML = '';
+                data.notes.forEach(note => {
+                    const isCurrentUser = note.author._id.toString() === '<%= currentUser._id %>';
+                    const noteElement = document.createElement('div');
+                    noteElement.className = `d-flex flex-row justify-content-${isCurrentUser ? 'end' : 'start'} mb-4 pt-1`;
+                    
+                    const avatarHtml = (user) => `
+                        <div class="profile-image-container ${isCurrentUser ? 'ms-3' : 'me-3'}">
+                            ${user.profile && user.profile.avatar && user.profile.avatar.data
+                                ? `<img src="data:${user.profile.avatar.contentType};base64,${btoa(String.fromCharCode.apply(null, new Uint8Array(user.profile.avatar.data)))}"
+                                       alt="Profile Picture" 
+                                       class="rounded-circle d-flex align-self-start shadow-1-strong" width="60">`
+                                : `<img src="/default-avatar.png" 
+                                       alt="Default Profile Picture" 
+                                       class="rounded-circle d-flex align-self-start shadow-1-strong" width="60">`
+                            }
+                        </div>
+                    `;
+
+                    noteElement.innerHTML = `
+                        ${!isCurrentUser ? avatarHtml(note.author) : ''}
+                        <div>
+                            <p class="small p-2 ${isCurrentUser ? 'me-3 text-white rounded-3 bg-primary' : 'ms-3 rounded-3 bg-body-tertiary'}">
+                                ${note.text}
+                            </p>
+                            <p class="small ${isCurrentUser ? 'me-3' : 'ms-3'} mb-3 rounded-3 text-muted">
+                                ${note.author.firstName} ${note.author.lastName}
+                                (${note.authorRole.charAt(0).toUpperCase() + note.authorRole.slice(1)})
+                                • ${new Date(note.createdAt).toLocaleString()}
+                            </p>
+                        </div>
+                        ${isCurrentUser ? avatarHtml(note.author) : ''}
+                    `;
+                    notesContainer.appendChild(noteElement);
+                });
+                notesContainer.scrollTop = notesContainer.scrollHeight;
+            })
+            .catch(error => {
+                console.error('Error refreshing notes:', error);
+            });
+        }
+
+        document.getElementById('notesModal').addEventListener('show.bs.modal', refreshNotes);
+
+        document.getElementById('notesModal').addEventListener('shown.bs.modal', function () {
+            notesContainer.scrollTop = notesContainer.scrollHeight;
+        });
+
+        // Mark notes as read when the modal is opened
+        document.getElementById('notesModal').addEventListener('show.bs.modal', function () {
+            fetch('/consultation/<%= consultation._id %>/mark-notes-read', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === 'Notes marked as read') {
+                    // Remove the notification badge
+                    const badge = document.querySelector('#notesButton .badge');
+                    if (badge) {
+                        badge.remove();
+                    }
+                }
+            })
+            .catch((error) => {
+                console.error('Error marking notes as read:', error);
+            });
+        });
+    });
+</script>
